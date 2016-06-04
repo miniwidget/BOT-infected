@@ -11,13 +11,14 @@ namespace Infected
     {
         #region Perk
 
+        int Y1 = 65, k = 120, j = 40;
+        int X2 = -120, X2_ = -100, X2__ = -50, Y2 = 250, Y2_ = 250, Y2__ = 250, jm = 80, jm_ = 80, jm__ = 120;
+        float alp_ = 0.8f, alp0 = 0.1f, alp = 0.1f, alp_2 = 0.2f, alp__ = 0.5f, f1 = 0.25f, f2 = 0.25f;
+
         void Perk_Hud(Entity player, int i)
         {
-            int Y1 = 65, k = 120,j = 40;
-            int X2 = -120, X2_ = -100, X2__ = -50, Y2 = 250,Y2_ = 250,Y2__ = 250,jm = 80,jm_ = 80,jm__ = 120;
-            float alp_ = 0.8f,alp0 = 0.1f,alp = 0.1f, alp_2 = 0.2f, alp__ = 0.5f, f1 = 0.25f,f2 = 0.25f;
-
-           // i -= 1;
+            if (i > 10 || i<0) return;
+            i -= 1;
 
             HudElem PH = HudElem.NewClientHudElem(player);
             PH.Foreground = true;

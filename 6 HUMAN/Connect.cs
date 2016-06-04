@@ -28,7 +28,7 @@ namespace Infected
             if (player.Name == ADMIN_NAME)
             {
                 ADMIN = player;
-                if (TEST)
+                if (TEST_)
                 {
                     player.Call("thermalvisionfofoverlayon");
                     player.Call("setmovespeedscale", 1.5f);

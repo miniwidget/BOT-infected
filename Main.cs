@@ -10,6 +10,7 @@ namespace Infected
 {
     public partial class Infected : BaseScript
     {
+
         public Infected()
         {
             #region 세팅 불러오기
@@ -18,7 +19,7 @@ namespace Infected
             {
                 using (StreamReader set = new StreamReader(setFile))
                 {
-                    bool value;
+                    bool b;
                     int i;
                     float f;
 
@@ -30,32 +31,38 @@ namespace Infected
                         string[] split = line.Split('=');
                         if (split.Length < 1) continue;
 
-                        string type = split[0];
-                        switch (type)
+                        string name = split[0];
+                        string value = split[1];
+                        var comment = value.IndexOf("//");
+                        if (comment != -1) value = value.Substring(0, comment);
+
+                        switch (name)
                         {
-                            case "SERVER_NAME": SERVER_NAME = split[1]; break;
-                            case "ADMIN_NAME": ADMIN_NAME = split[1]; break;
-                            case "TEAMNAME_ALLIES": TEAMNAME_ALLIES = split[1]; break;
-                            case "TEAMNAME_AXIS": TEAMNAME_AXIS = split[1]; break;
-							case "WELLCOME_MESSAGE": WELLCOME_MESSAGE = split[1];break;
+                            case "SERVER_NAME": SERVER_NAME = value; break;
+                            case "ADMIN_NAME": ADMIN_NAME = value; break;
+                            case "TEAMNAME_ALLIES": TEAMNAME_ALLIES = value; break;
+                            case "TEAMNAME_AXIS": TEAMNAME_AXIS = value; break;
+                            case "WELLCOME_MESSAGE": WELLCOME_MESSAGE = value; break;
 
-                            case "INFECTED_TIMELIMIT": if (float.TryParse(split[1], out f)) INFECTED_TIMELIMIT = f; break;
-                            case "PLAYERWAIT_TIME": if (float.TryParse(split[1], out f)) PLAYERWAIT_TIME = f; break;
-                            case "MATCHSTART_TIME": if (float.TryParse(split[1], out f)) MATCHSTART_TIME = f; break;
-                            case "SEARCH_TIME": if (int.TryParse(split[1], out i)) SEARCH_TIME = i; break;
-                            case "FIRE_TIME": if (int.TryParse(split[1], out i)) FIRE_TIME = i; break;
-                            case "BOT_DELAY_TIME": if (int.TryParse(split[1], out i)) BOT_DELAY_TIME = i; break;
+                            case "INFECTED_TIMELIMIT": if (float.TryParse(value, out f)) INFECTED_TIMELIMIT = f; break;
+                            case "PLAYERWAIT_TIME": if (float.TryParse(value, out f)) PLAYERWAIT_TIME = f; break;
+                            case "MATCHSTART_TIME": if (float.TryParse(value, out f)) MATCHSTART_TIME = f; break;
+                            case "SEARCH_TIME": if (int.TryParse(value, out i)) SEARCH_TIME = i; break;
+                            case "FIRE_TIME": if (int.TryParse(value, out i)) FIRE_TIME = i; break;
+                            case "BOT_DELAY_TIME": if (int.TryParse(value, out i)) BOT_DELAY_TIME = i; break;
 
-                            case "TEST_": if (bool.TryParse(split[1], out value)) TEST = value; break;
-                            case "DEPLAY_BOT_": if (bool.TryParse(split[1], out value)) DEPLAY_BOT_ = value; break;
-                            case "USE_ADMIN_SAFE_": if (bool.TryParse(split[1], out value)) USE_ADMIN_SAFE_ = value; break;
-                            case "SUICIDE_BOT_": if (bool.TryParse(split[1], out value)) SUICIDE_BOT_ = value; break;
+                            case "TEST_": if (bool.TryParse(value, out b)) TEST_ = b; break;
+                            case "DEPLAY_BOT_": if (bool.TryParse(value, out b)) DEPLAY_BOT_ = b; break;
+                            case "USE_ADMIN_SAFE_": if (bool.TryParse(value, out b)) USE_ADMIN_SAFE_ = b; break;
+                            case "SUICIDE_BOT_": if (bool.TryParse(value, out b)) SUICIDE_BOT_ = b; break;
+                            case "Disable_Melee_": if (bool.TryParse(value, out b)) Disable_Melee_ = b; break;
                         }
                     }
                 }
             }
             #endregion
 
+            Server_SetDvar();
 
             char[] numChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             PlayerConnecting += (player) =>
@@ -65,7 +72,7 @@ namespace Infected
                 if (name.StartsWith("bot"))
                 {
                     Call("kick", player.EntRef);
-                    if (TEST) print(name + "KICKED★");
+                    if (TEST_) print(name + "KICKED★");
                 }
             };
             PlayerConnected += (player) =>
@@ -77,7 +84,7 @@ namespace Infected
                     if (!PREMATCH_DONE)
                     {
                         Call("kick", player.EntRef);
-                        if (TEST) print("BOT" + player.EntRef + " kicked before PMCH");
+                        if (TEST_) print("BOT" + player.EntRef + " kicked before PMCH");
                         return;
                     }
                     Bot_Connected(player);
@@ -91,10 +98,8 @@ namespace Infected
             OnNotify("prematch_done", () =>
             {
                 PREMATCH_DONE = true;
-                Server_SetDvar();
                 Server_Hud();
                 if (DEPLAY_BOT_) deplayBOTs();
-                //setCooling();
             });
 
             OnNotify("game_ended", (level) =>
@@ -103,14 +108,10 @@ namespace Infected
             });
         }
 
-        public override void OnExitLevel()
-        {
-            if (NEXT_MAP == null) NEXT_MAP = "mp_dome";
-            AfterDelay(100, () =>
-            {
-                Utilities.ExecuteCommand("map" + NEXT_MAP);
-            });
-        }
+        //public override void OnExitLevel()
+        //{
+            //Utilities.ExecuteCommand("map " + NEXT_MAP);
+        //}
 
     }
 }

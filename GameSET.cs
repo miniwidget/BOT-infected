@@ -21,12 +21,12 @@ namespace Infected
 			 WELLCOME_MESSAGE,
              NEXT_MAP;
         bool
-            TEST = false,
+            TEST_ = false,
 
-            //DISABLE_MELEE_OF_INFECTED_ = true,
             USE_ADMIN_SAFE_ = false,
             DEPLAY_BOT_,
             SUICIDE_BOT_,
+            Disable_Melee_,
 
             GAME_ENDED_,
             HUMAN_CONNECTED_,
@@ -212,73 +212,37 @@ namespace Infected
             Call("setdvar", "scr_game_allowkillcam", "0");
             Call("setdvar", "scr_infect_timelimit", INFECTED_TIMELIMIT);//Call("setdvar", "scr_player_maxhealth", "");Call("setdvar","scr_player_healthregentime","");
             Call("setdvar", "g_gametype", GAMETYPE);
+            if (TEST_)
+            {
 
+            }
             readMap();
 
-            if (TEST)
+            if (TEST_)
             {
                 Utilities.ExecuteCommand("sv_hostname test");
                 Utilities.RawSayAll("^2TEST ^7MODE confirmed");
             }else
             {
                 Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
-                
             }
         }
         void readMap()
         {
-            string path = "admin\\Infected_temp.txt";
-            string map = "";
+            string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
 
-            if (File.Exists(path))
-            {
-                map = File.ReadAllText(path);
+            MAP_NAME = Call<string>("getdvar", "mapname");
+            var map_list = ENTIRE_MAPLIST.Split('|').ToList();
+            int index = map_list.IndexOf(MAP_NAME);
+            if (index == 35) index = 0;
 
-                if (map != null)
-                    MAP_NAME = map;
-                else
-                    MAP_NAME = Call<string>("getdvar", "mapname");
-            }
-            else
-                MAP_NAME = Call<string>("getdvar", "mapname");
+            NEXT_MAP = map_list[index+1];
+            Call("setdvar", "sv_nextmap", NEXT_MAP);
 
-            string[] mapArray = ENTIRE_MAPLIST.Split('|');
-            int idx = 0;
-            try
-            {
-                int max = mapArray.Length - 1;
-                if (TEST) print("현재맵 : " + MAP_NAME + " // " + "맵 갯수 : " + max);
-                for (int i = 0; i < max; i++)
-                {
-                    if (mapArray[i] == map)
-                    {
-                        if (i == max)
-                        {
-                            idx = 0;
-                        }
-                        else
-                        {
-                            idx = i + 1;
-                        }
-                        NEXT_MAP = mapArray[idx];
-                        break;
-                    }
-                }
-                if (TEST)
-                {
-                    print("맵 인덱스 : " + idx + "다음 맵 : " + mapArray[idx]);
-                }
-            }
-            catch
-            {
-                NEXT_MAP = "mp_aground_ss";
-            }
-            Call("setdvar", "sv_nextmap", mapArray[idx]);
+            string content = NEXT_MAP +",bot_infected,1";
+            File.WriteAllText(@"admin\default.dspl", content);
 
-            File.WriteAllText("scripts\\Infected_temp.txt", NEXT_MAP);
+            print("현재맵 : " + MAP_NAME + " & " + "다음맵 : " + NEXT_MAP);
         }
-      
-        string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
-
     }
 }

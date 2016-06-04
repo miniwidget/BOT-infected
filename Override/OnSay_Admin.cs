@@ -248,8 +248,8 @@ namespace Infected
 
                 case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
                 case "fr": KickBOTsAll(); executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed"); return false;
-
-                case "mr": KickBOTsAll(); executeAfter(t2, "map_rotate", "^2NEXT MAP ^7executed"); return false;
+                    //
+                case "mr": 
                 case "nm": KickBOTsAll(); executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed"); return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;

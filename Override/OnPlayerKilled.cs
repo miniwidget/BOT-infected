@@ -16,14 +16,27 @@ namespace Infected
 
             //if (mod == "MOD_FALLING" && !isBOT(player)) player.Health += damage;
 
-            //if (_Disable_Melee_of_Infected) if (mod == "MOD_MELEE" && isSurvivor(attacker)) player.Health += damage;//if (Enable_Auto_Melee_of_BOTs) { }
-
+            if (mod == "MOD_MELEE")
+            {
+                if (Disable_Melee_)
+                {
+                    if (!player.Name.StartsWith("bot") && isSurvivor(player)) player.Health += damage;
+                }
+                return;
+            }
             if (attacker == player)
             {
                 if (weapon == "rpg_mp") player.Health += damage;
+                return;
             }
 
-            if (USE_ADMIN_SAFE_) if (ADMIN != null) ADMIN.Health += damage;
+            if (USE_ADMIN_SAFE_)
+            {
+                if (ADMIN != null)
+                {
+                    if (player == ADMIN) ADMIN.Health += damage;
+                }
+            }
         }
 
         public override void OnPlayerKilled(Entity killed, Entity inflictor, Entity attacker, int damage, string mod, string weapon, Vector3 dir, string hitLoc)
@@ -41,13 +54,16 @@ namespace Infected
 
                 if (pc < 34 && weapon[2] == '5')//iw5
                 {
-                    attacker.SetField("PERK", pc + 1);
 
-                    var i = pc % 3;
-                    if (i == 0)
+                    var i = pc + 1;
+                    attacker.SetField("PERK", i);
+
+                    print("이전 퍼크 카운트 : " + pc + " 업데이트 카운트 : " + i + " 몫 : " + i / 3 + " 나머지 : " + i % 3);
+
+                    if (i >2 && i % 3 == 0)
                     {
                         attacker.Call(33466, "mp_killstreak_radar");//playlocalsound
-                        attacker.AfterDelay(100, a => Perk_Hud(attacker, pc / 3));
+                        attacker.AfterDelay(100, a => Perk_Hud(attacker, i / 3));
                     }
                 }
                 //Utilities.RawSayAll(attacker.Name + " ^2KILLED ^2/ ^7" + killed.Name + "!!!");
@@ -57,10 +73,11 @@ namespace Infected
             {
                 if (BotAttker) // 봇이 사람을 죽인 경우
                 {
-                    AfterDelay(100, () =>    Utilities.RawSayAll("^1BAD Luck :) ^7" + killed.Name + " killed by " + attacker.Name));
-                    int num = attacker.GetField<int>("tNum");
+                    AfterDelay(100, () => Utilities.RawSayAll("^1BAD Luck :) ^7" + killed.Name + " killed by " + attacker.Name));
+                    int bid = attacker.GetField<int>("bid");
+                    bot_search[bid] = bot_fire[bid] = false;
+
                     attacker.SetField("tNum", -1);
-                    bot_search[num] = bot_fire[num] = false;
                 }
 
                 if (killed == attacker)

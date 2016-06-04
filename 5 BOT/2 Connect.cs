@@ -47,7 +47,7 @@ namespace Infected
         {
             print("■ ■ waitOnFirstInfected");
 
-            int failCount=0;
+            int failCount = 0;
             OnInterval(t2, () =>
             {
                 if (failCount == 30)
@@ -156,7 +156,7 @@ namespace Infected
                 return true;
             });
         }
-   
+
         /// <summary>
         /// 봇 다 죽임. 사람이 접속 한 경우이다.
         /// </summary>
@@ -164,7 +164,7 @@ namespace Infected
         {
             if (HUMAN_COUNT == 1)
             {
-                deplayBOTs_map_init(false, "^2GAME RESTART ^7in 3 seconds", 5);
+                deplayBOTs_map_init(false, "^2GAME RESTART ^7in 8 seconds", 8);
                 return;
             }
             print("■ ■ BotSuicideAll. HUMAN : " + HUMAN_COUNT);
@@ -195,6 +195,8 @@ namespace Infected
                 bot.SpawnedPlayer += () => spawned_bot(bot);
                 spawned_bot(bot);
             }
+
+            if (!SUICIDE_BOT_) return;
 
             bot.Call("suicide");
             bot.Notify("menuresponse", "changeclass", BOTs_CLASS[i]);

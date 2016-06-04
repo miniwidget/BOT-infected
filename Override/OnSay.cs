@@ -23,13 +23,15 @@ namespace Infected
             {
                 if (!AdminCommand(text)) return;
             }
-            if (text.Split(' ').Length >1) return;
+
+            if (GAME_ENDED_|| text.Split(' ').Length >1) return;
             text = text.ToLower();
 
             #region Public Say
 
             switch (text)
             {
+                case "nextmap": AfterDelay(t0, () => Utilities.RawSayTo(player, "^2NEXT MAP : " + NEXT_MAP));break;
                 //case "register":
                 //    File.AppendAllText("scripts\\welcome\\" + "member" + ".txt", Environment.NewLine + "member:" + player.Name + ",");
                 //    AfterDelay(t1, () => Utilities.RawSayTo(player, "^2[ ^7" + player.Name + " ^2] register confirmed"));

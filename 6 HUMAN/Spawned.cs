@@ -30,7 +30,7 @@ namespace Infected
             else if (aw == 1)
             {
                 AxisHud(player);
-                //if (DISABLE_MELEE_OF_INFECTED_) Utilities.RawSayTo(player, "^2[ ^7DISABLED ^2] Melee of the Infected");
+                Utilities.RawSayTo(player, "^2[ ^7DISABLED ^2] Melee of the Infected");
 
                 AxisWeapon_by_init(player);
 

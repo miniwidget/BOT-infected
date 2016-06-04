@@ -110,6 +110,17 @@ namespace Infected
                             //b.Call("setorigin", o);
                 //b.Call("setmovespeedscale", 1);//setmovespeedscale
 
+
+                    string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
+
+            MAP_NAME = Call<string>("getdvar", "mapname");
+            var map_list = ENTIRE_MAPLIST.Split('|').ToList();
+            int index = map_list.IndexOf(MAP_NAME);
+            if (index == 35) index = 0;
+            NEXT_MAP = map_list[index+1];
+            Call("setdvar", "sv_nextmap", NEXT_MAP);
+            print("맵 인덱스 : " + index + " 다음 맵 : " + NEXT_MAP);
+
         */
 
     }
