@@ -32,6 +32,7 @@ namespace Infected
             bot.Call("suicide");
             bot.Notify("menuresponse", "changeclass", BOTs_CLASS[i]);
 
+            //IMPORTANT
             bot.SetField("bid", i);
             bot.SetField("tNum", -1);
 
@@ -103,7 +104,7 @@ namespace Infected
             print("■ ■ BotSuicideExceptFirst. HUMAN : " + HUMAN_COUNT);
             print("■ ■ Inf : " + first_Inf_BOT.Name + " JJUG : " + BOTs_List[0].Name);
 
-            var max = BOTs_List.Count;
+            var max = BOTs_List.Count-1;
             int i = 0;
             int fidx = BOTs_List.IndexOf(first_Inf_BOT);
 
@@ -130,15 +131,15 @@ namespace Infected
         /// </summary>
         void BotSuicideExceptFinal()
         {
-            var max = BOTs_List.Count;
+            var max = BOTs_List.Count-1;
 
             int fidx = BOTs_List.IndexOf(first_Inf_BOT);
 
             int lastidx = 0;
             if (fidx == 0) lastidx = 1; else lastidx = fidx - 1;
-
-            print("■ ■ BotSuicideExceptFinal. NO HUMAN");
-            print("■ ■ Inf : " + first_Inf_BOT.Name + " JUGG : " + BOTs_List[0].Name + " Last_Surv : " + BOTs_List[fidx].Name);
+           
+            print("■ ■ BotSuicideExceptFinal. NO HUMAN bots_count:"+max );
+            print("■ ■ Inf bot_idx: " + fidx + " Last_Surv bot_idx: " + lastidx);
             int i = 0;
 
             OnInterval(250, () =>
@@ -146,12 +147,33 @@ namespace Infected
                 if (i == max)
                 {
                     changeBotClass(first_Inf_BOT, fidx);
+                    int axis=0,surv=0;
+                    foreach (Entity bot in BOTs_List)
+                    {
+                        if (isSurvivor(bot))
+                        {
+                            surv++;
+                        }else
+                        {
+                            axis++;
+                        }
+                    }
+                    print("AXIS: " + axis + " ALLIES: "+surv);
                     return false;
                 }
-                if (i == fidx || i == lastidx) return true;// 살려 놓은 봇 , 첫 감염자 봇
+                if (i == fidx || i == lastidx)
+                {
+                    if (TEST_)
+                    {
+                        if(i == fidx) print(BOTs_List[i].Name + "//FIRST_inf:" + i);
+                        else print(BOTs_List[i].Name + "//LAST_inf:" + i);
+                    }
+                    if (i != max) i++;
+                    return true;// 살려 놓은 봇 , 첫 감염자 봇
+                }
 
                 changeBotClass(BOTs_List[i], i);
-
+                if (TEST_) print(BOTs_List[i].Name + "//" + i);
                 i++;
                 return true;
             });
@@ -168,9 +190,9 @@ namespace Infected
                 return;
             }
             print("■ ■ BotSuicideAll. HUMAN : " + HUMAN_COUNT);
-            print("■ ■ Inf : " + player.Name + " JUGG : " + BOTs_List[0].Name);
+            print("■ ■ Inf : " + player.Name );
 
-            var max = BOTs_List.Count;
+            var max = BOTs_List.Count-1;
             int i = 0;
             OnInterval(250, () =>
             {

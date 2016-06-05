@@ -9,29 +9,7 @@ namespace Infected
 {
     public partial class Infected
     {
-        #region 관리자 커맨드 메서드
-        Entity getBot(int num)
-        {
-            int j = 0;
-            for (int i = 0; i < 17; i++)
-            {
-                Entity player = Call<Entity>("getEntByNum", i);
-                if (player != null && player.IsPlayer)
-                {
-
-                    if (player.Name.StartsWith("bot"))
-                    {
-                        j++;
-                        if (j == 1)
-                        {
-                            return player;
-                        }
-                    }
-                }
-
-            }
-            return ADMIN;
-        }
+        #region related with BOT
         void KickBOTsAll()
         {
             for (int i = 17; i > 0; i--)
@@ -64,7 +42,20 @@ namespace Infected
             bot.SwitchToWeapon(weapon);
             bot.SwitchToWeaponImmediate(weapon);
         }
-        void giveWeaponToBot()
+        void moveBot(string name)
+        {
+            if (name == null) name = "bot";
+            foreach (var bot in BOTs_List)
+            {
+                if (bot.Name.Contains(name))
+                {
+                    bot.Call("setorigin", ADMIN.Origin);
+                    break;
+                }
+            }
+        }
+
+        /* void giveWeaponToBot()
         {
             Entity bot = BOTs_List[rnd.Next(BOTs_List.Count)];
             bot.TakeAllWeapons();
@@ -74,13 +65,40 @@ namespace Infected
             //bot.SwitchToWeaponImmediate(weapon);
             bot.Call("setorigin", ADMIN.Origin);
         }
+        */
+
+        /* void hideBot(string name)
+        {
+            if (name == null) name = "bot";
+            foreach (var bot in BOTs_List)
+            {
+                if (bot.Name.Contains(name))
+                {
+                    bot.Call("setorigin", ADMIN.Origin);
+                    AfterDelay(t2, () =>
+                    {
+                        bot.Call("hide");
+                        AfterDelay(t2, () =>
+                        {
+                            bot.Call("show");
+                        });
+                    });
+                    break;
+                }
+            }
+        }
+        */
+
+        #endregion
+
+        #region related with KILL or KICK
         void Die(string message)
         {
             Char[] delimit = { ' ' };
             String[] split = message.Split(delimit);
             if (split.Length == 1)
             {
-                printToAdmin("die [player's name]");
+                sayToAdmin("die [player's name]");
             }
 
             else if (split.Length > 1)
@@ -105,12 +123,10 @@ namespace Infected
         {
             Char[] delimit = { ' ' }; String[] split = message.Split(delimit);
 
-            if (split.Length == 1) printToAdmin("magic [player's name]");
+            if (split.Length == 1) sayToAdmin("magic [player's name]");
 
             else if (split.Length > 1)
             {
-                //Admin.Call("allowspectateteam", "freelook", true);
-                //Admin.SetField("sessionstate", "spectator");
                 for (int i = 0; i < 18; i++)
                 {
                     Entity player = Call<Entity>("getEntByNum", i);
@@ -127,12 +143,6 @@ namespace Infected
 
                     }
                 }
-
-                //AfterDelay(100, () =>
-                //{
-                //    Admin.Call("allowspectateteam", "freelook", false);
-                //    Admin.SetField("sessionstate", "playing");
-                //});
             }
         }
 
@@ -142,7 +152,7 @@ namespace Infected
             String[] split = message.Split(delimit);
             if (split.Length == 1)
             {
-                printToAdmin("warn [player's name]");
+                sayToAdmin("warn [player's name]");
             }
 
             else if (split.Length > 1)
@@ -164,16 +174,9 @@ namespace Infected
             }
         }
 
-        void PingKick(Entity player)
-        {
-            if (player.Ping >= 450)
-            {
-                player.Call("iPrintlnBold", "your ping is too high");
+        #endregion
 
-                AfterDelay(t5, () => Utilities.ExecuteCommand("dropclient " + player.EntRef));
-            }
-        }
-
+        #region BUFF
         bool specMode;
         void changeSpecMode()
         {
@@ -190,6 +193,9 @@ namespace Infected
             }
 
         }
+        #endregion
+
+        #region 관리자 커맨드 메서드
 
         void script(string name, bool load)
         {
@@ -206,7 +212,7 @@ namespace Infected
         {
             Log.Write(LogLevel.None, "{0}", s.ToString());
         }
-        void printToAdmin(string m)
+        void sayToAdmin(string m)
         {
             AfterDelay(t0, () => Utilities.RawSayTo(ADMIN, m));
         }
@@ -214,9 +220,9 @@ namespace Infected
         {
             AfterDelay(delay, () => Utilities.ExecuteCommand(command));
         }
-        void executeAfter(int delay, string command, string publicPrint)
+        void executeAfter(int delay, string command, string sayAll)
         {
-            Utilities.RawSayAll(publicPrint);
+            Utilities.RawSayAll(sayAll);
             AfterDelay(delay, () => Utilities.ExecuteCommand(command));
         }
         void executeAfter(int delay, string command, Action act)
@@ -224,69 +230,65 @@ namespace Infected
             act.Invoke();
             AfterDelay(delay, () => Utilities.ExecuteCommand(command));
         }
+        
         #endregion
+
         bool AdminCommand(string text)
         {
 
             switch (text)
             {
-                case "pos": moveBot(null); break;
-                case "ab": addBot();break;
-                //case "har": spawnHarrir();break;
-                //case "h": rideHeli(); break;
-                case "s": changeSpecMode(); return false;
-                case "safe":USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_;printToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
-                //case "knife": DISABLE_MELEE_OF_INFECTED_ = !DISABLE_MELEE_OF_INFECTED_; Utilities.RawSayAll("^2Melee " + DISABLE_MELEE_OF_INFECTED_ + " ^7executed"); return false;
+                case "test": test(); return false;
 
-                //case "son": ADMIN.Call("setmovespeedscale", 1.5f); printToAdmin("^2Speed ^7x 1.5"); return false;
-                //case "soff": ADMIN.Call("setmovespeedscale", 1f); printToAdmin("^2Speed ^7x 1.0"); return false;
-
+                case "pos": moveBot(null); return false;
+                case "ab": addBot(); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
 
+                case "s": changeSpecMode(); return false;
                 case "1": ADMIN.Call("thermalvisionfofoverlayon"); return false;
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
+                case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
 
-                case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
                 case "fr": KickBOTsAll(); executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed"); return false;
-                    //
                 case "mr": 
                 case "nm": KickBOTsAll(); executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed"); return false;
+                case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
-                case "list": printToAdmin(ADMIN.Call<string>("getGuid") + "/" + ADMIN.GetField<string>("name")); return false;
-
+                case "list": sayToAdmin(ADMIN.Call<string>("getGuid") + "/" + ADMIN.GetField<string>("name")); return false;
+                case "readmap":readMap();return false;
             }
+
             var t = text.Split(' ');
             if (t.Length > 1)
             {
                 var txt = t[0];
+                var value = t[1];
                 switch (txt)
                 {
-                    case "pos": moveBot(t[1]); break;
+                    case "pos": moveBot(value); break;
 
-                    case "bot": DeployBOTsByNUM(int.Parse(t[1])); return false;
+                    case "bot": DeployBOTsByNUM(int.Parse(value)); return false;
                     case "die": Die(text); return false;
                     case "k": Kick(text); return false;
                     case "magic": Magic(text); return false;
-                    case "so": ADMIN.Call("playlocalsound", t[1]); return false;
-                    case "map": executeAfter(t2, "map " + t[1], "^2Map changed^7 to " + t[1] + " executed"); return false;
+                    case "so": ADMIN.Call("playlocalsound", value); return false;
+                    case "map": executeAfter(t2, "map " + value, "^2Map changed^7 to " + value + " executed"); return false;
 
                     case "l":
-                        script(t[1], true);
-                        executeAfter(t2, "fast_restart", "Loadscript ^2" + t[1] + " ^7executed");
+                        script(value, true);
+                        executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
                         return false;
 
                     case "ul":
-                        script(t[1], false);
-                        Utilities.ExecuteCommand("unloadscript " + t[1] + ".dll");
-                        executeAfter(t2, "fast_restart", "UnLoadscript ^2" + t[1] + " ^7executed");
+                        script(value, false);
+                        executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
                         return false;
                 }
             }
 
             return true;
         }
-
 
     }
 }

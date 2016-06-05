@@ -34,9 +34,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InfinityScript, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\InfinityScript.dll</HintPath>
+    <Reference Include="InfinityScript">
+      <HintPath>How To Use\script\InfinityScript.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,14 +51,14 @@
     <Compile Include="5 BOT\1 DeployBOT.cs" />
     <None Include="3 WEAPON\Class1.cs" />
     <Compile Include="5 BOT\Cooling.cs" />
-    <Compile Include="6 HUMAN\4 KillstreakBOT.cs" />
+    <Compile Include="업데이트할 것들\4 KillstreakBOT.cs" />
     <Compile Include="5 BOT\3 Spawned.cs" />
     <Compile Include="5 BOT\2 Connect.cs" />
     <Compile Include="6 HUMAN\Connect.cs" />
     <Compile Include="6 HUMAN\Spawned.cs" />
     <Compile Include="Override\OnSay.cs" />
-    <None Include="SET\업데이트할 것들\IAM.cs" />
-    <Compile Include="SET\업데이트할 것들\temp.cs" />
+    <None Include="업데이트할 것들\IAM.cs" />
+    <Compile Include="업데이트할 것들\temp.cs" />
     <Compile Include="Override\OnPlayerKilled.cs" />
     <Compile Include="GameSET.cs" />
     <Compile Include="4 PERK\Perk.cs" />
@@ -72,7 +71,9 @@
     <None Include="1 MAP\Mapedit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="SET\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -45,6 +45,7 @@ namespace Infected
 
             print(name + " connected ♥");
 
+            //IMPORTANT
             foreach (string f in new string[] { "PERK", "AX_WEP", "byAttack", "FAIL_COUNT"})
             {
                 player.SetField(f, 0);

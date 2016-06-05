@@ -15,17 +15,17 @@ namespace Infected
             ADMIN_NAME,
             TEAMNAME_ALLIES,
             TEAMNAME_AXIS,
-            GAMETYPE = "infect",// [ war, dm, sd, sab, dom, koth, ctf, dd, tdef, conf, grnd, tjugg, jugg, gun, infect, oic ]
-             OFF_HAND,
-             MAP_NAME,
-			 WELLCOME_MESSAGE,
-             NEXT_MAP;
+            GAMETYPE = "infect",
+            OFF_HAND,
+            MAP_NAME,
+			WELLCOME_MESSAGE,
+            NEXT_MAP;
         bool
             TEST_ = false,
 
             USE_ADMIN_SAFE_ = false,
             DEPLAY_BOT_,
-            SUICIDE_BOT_,
+            SUICIDE_BOT_=true,
             Disable_Melee_,
 
             GAME_ENDED_,
@@ -33,15 +33,10 @@ namespace Infected
             PREMATCH_DONE,
             OVERFLOW_BOT_;
 
-
         float
             INFECTED_TIMELIMIT,
             PLAYERWAIT_TIME,
             MATCHSTART_TIME;
-
-            
-        //mus = "mp_time_running_out_losing";
-
 
         int
             t0 = 100, t1 = 1000, t2 = 2000, t3 = 3000, t5 = 5000,
@@ -51,7 +46,7 @@ namespace Infected
 
         Entity ADMIN;
 
-        public static Random rnd = new Random();
+        Random rnd = new Random();
 
         #endregion
 
@@ -72,7 +67,7 @@ namespace Infected
             player.SetClientDvar("cg_scoreboardpingtext", "1");
             player.SetClientDvar("cg_brass", "1");
             player.SetClientDvar("clientsideeffects", "1");
-            player.SetClientDvar("cl_maxpackets", "60");
+            //player.SetClientDvar("cl_maxpackets", "60");
             player.SetClientDvar("com_maxfps", "91");
             player.SetClientDvar("waypointIconHeight", "13");
             player.SetClientDvar("waypointIconWidth", "13");
@@ -201,31 +196,32 @@ namespace Infected
         }
         void Server_SetDvar()
         {
-            Call("setdvar", "motd", WELLCOME_MESSAGE);
-
             Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
             Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
 
-            Call("setdvar", "scr_game_playerwaittime", PLAYERWAIT_TIME);
-            Call("setdvar", "scr_game_matchstarttime", MATCHSTART_TIME);
             Call("setdvar", "scr_player_respawndelay", "2.5f");
             Call("setdvar", "scr_game_allowkillcam", "0");
             Call("setdvar", "scr_infect_timelimit", INFECTED_TIMELIMIT);//Call("setdvar", "scr_player_maxhealth", "");Call("setdvar","scr_player_healthregentime","");
             Call("setdvar", "g_gametype", GAMETYPE);
-            if (TEST_)
-            {
 
-            }
-            readMap();
+            Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
 
             if (TEST_)
             {
-                Utilities.ExecuteCommand("sv_hostname test");
-                Utilities.RawSayAll("^2TEST ^7MODE confirmed");
+                MATCHSTART_TIME= PLAYERWAIT_TIME = 3;
+
+                Utilities.ExecuteCommand("seta g_password \"0\"");
+                print("TEST MODE ===========================");
             }else
             {
-                Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
+
+                Utilities.ExecuteCommand("seta g_password \"\"");
+                readMap();
             }
+
+            Call("setdvar", "scr_game_playerwaittime", PLAYERWAIT_TIME);
+            Call("setdvar", "scr_game_matchstarttime", MATCHSTART_TIME);
+
         }
         void readMap()
         {
@@ -244,5 +240,6 @@ namespace Infected
 
             print("현재맵 : " + MAP_NAME + " & " + "다음맵 : " + NEXT_MAP);
         }
+
     }
 }

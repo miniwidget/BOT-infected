@@ -234,6 +234,7 @@ namespace Infected
                         bot.SetField("tNum", human.EntRef);
                         bot_fire[num] = true;
                         pause = false;
+                        if(num==1) human.Call(33466, "missile_incoming");
 
                         b.OnInterval(fire_time, bb =>
                         {

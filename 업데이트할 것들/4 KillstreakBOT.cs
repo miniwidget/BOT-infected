@@ -11,6 +11,10 @@ namespace Infected
 {
     public partial class Infected
     {
+        /// <summary>
+        /// TEST
+        /// </summary>
+        /// <param name="player"></param>
         //헬리콥터 봇
         #region 헬리콥터 봇
         void spawnd_bot_heli(Entity player)
@@ -21,7 +25,8 @@ namespace Infected
 
         }
         #endregion
-        //참조 http://pastebin.com/c2xDcfGd
+
+        // http://pastebin.com/c2xDcfGd
         // http://pastebin.com/Bb1mqEua
         // http://pastebin.com/aP0caf99
 
@@ -63,38 +68,6 @@ namespace Infected
             return;
         }
 
-        void moveBot(string name)
-        {
-            if (name == null) name = "bot";
-            foreach (var bot in BOTs_List)
-            {
-                if (bot.Name.Contains(name))
-                {
-                    bot.Call("setorigin", ADMIN.Origin);
-                    break;
-                }
-            }
-        }
-        void hideBot(string name)
-        {
-            if (name == null) name = "bot";
-            foreach (var bot in BOTs_List)
-            {
-                if (bot.Name.Contains(name))
-                {
-                    bot.Call("setorigin", ADMIN.Origin);
-                    AfterDelay(t2, () =>
-                    {
-                        bot.Call("hide");
-                        AfterDelay(t2, () =>
-                        {
-                            bot.Call("show");
-                        });
-                    });
-                    break;
-                }
-            }
-        }
-
+ 
     }
 }

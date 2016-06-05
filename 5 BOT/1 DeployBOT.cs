@@ -13,9 +13,9 @@ namespace Infected
     {
         private List<Entity> human_List = new List<Entity>();
         List<Entity> BOTs_List = new List<Entity>();
-        private bool[] bot_search = new bool[18];
-        private bool[] bot_fire = new bool[18];
-        private bool isSurvivor(Entity player) { return player.GetField<string>("sessionteam") == "allies"; }//sessionteam
+        private bool[] bot_search = new bool[10];
+        private bool[] bot_fire = new bool[10];
+        private bool isSurvivor(Entity player) { return player.GetField<string>("sessionteam") == "allies"; }
         Entity first_Inf_BOT;
 
         #region 게임 시작 후, 봇 불러오기 //실패 시, 맵 다시 시작
@@ -58,7 +58,7 @@ namespace Infected
             staticBG.Alpha = 1f;
 
             int transitiontime = 100;
-            int duration = 5000;
+            int duration = 8000;
             int decayduration = 2000;
 
             HudElem END = HudElem.CreateServerFontString("default", 2f);

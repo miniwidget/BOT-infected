@@ -9,7 +9,29 @@ namespace Infected
 {
     public partial class Infected
     {
-    
+        string GetRandomWeapon()
+        {
+            int i = rnd.Next(7);
+            switch (i)
+            {
+                case 0: return AP();
+                case 1: return AG();
+                case 2: return AR();
+                case 3: return SM();
+                case 4: return LM();
+                case 5: return SG();
+                case 6: return SN();
+            }
+            return AR();
+        }
+        void giveWeaponTo(Entity player, string weapon)
+        {
+            player.TakeWeapon(player.CurrentWeapon);
+            player.GiveWeapon(weapon);
+            player.Call("givemaxammo", weapon);
+            player.SwitchToWeaponImmediate(weapon);
+        }
+
         string AP() { return _autoPistolList[rnd.Next(4)]; }
         string AG() { return _akimboGunlList[rnd.Next(6)]; }
         string AR() { return _arList[rnd.Next(10)] + _camoList[rnd.Next(11)]; }

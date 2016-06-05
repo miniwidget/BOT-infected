@@ -58,6 +58,8 @@ namespace Infected
                             case "Disable_Melee_": if (bool.TryParse(value, out b)) Disable_Melee_ = b; break;
                         }
                     }
+
+                    if (TEST_) SERVER_NAME = "^2BOT ^7TEST";
                 }
             }
             #endregion
@@ -105,6 +107,10 @@ namespace Infected
             OnNotify("game_ended", (level) =>
             {
                 GAME_ENDED_ = true;
+                AfterDelay(20000, () =>
+                {
+                    Utilities.ExecuteCommand("map_rotate");
+                });
             });
         }
 

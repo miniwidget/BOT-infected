@@ -10,8 +10,28 @@ namespace Infected
 {
     public partial class Infected
     {
+
         void human_spawned(Entity player)
         {
+            var deathCount = ADMIN.GetField<int>("deaths");
+            if (deathCount < 3)
+            {
+                player.Call("playlocalsound", "mp_last_stand"); 
+                player.AfterDelay(500, p =>
+                {
+                    player.SetField("sessionteam", "allies");
+                    player.Notify("menuresponse", "team_marinesopfor", "allies");
+                    player.Call("closePopupMenu");
+                    Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
+                    Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
+                    player.Call("iPrintlnBold", "^2[ ^7GRACE ^2] ONE LIFE MORE");
+                 
+                    giveWeaponTo(player, GetRandomWeapon());
+                });
+
+                return;
+            }
+
             var aw = player.GetField<int>("AX_WEP");
             if (aw == 0)
             {

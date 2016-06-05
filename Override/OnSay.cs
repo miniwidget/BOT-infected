@@ -10,13 +10,6 @@ namespace Infected
 {
     public partial class Infected
     {
-        void giveWeaponTo(Entity player, string weapon)
-        {
-            player.TakeWeapon(player.CurrentWeapon);
-            player.GiveWeapon(weapon);
-            player.Call("givemaxammo", weapon);
-            player.SwitchToWeaponImmediate(weapon);
-        }
         public override void OnSay(Entity player, string name, string text)
         {
             if (player.Name == ADMIN_NAME)

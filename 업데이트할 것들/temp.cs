@@ -10,10 +10,32 @@ namespace Infected
 {
     public partial class Infected
     {
+        void magicBullet()
+        {
+            ADMIN.OnNotify("weapon_fired", (p, weaponName) =>
+            {
+                Call("magicbullet", "ac130_25mm_mp", // bullet name
+                    new Parameter(ADMIN.Call<Vector3>("getTagOrigin", "tag_weapon_left")), // start point
+                    new Parameter(Call<Vector3>("anglestoforward", ADMIN.Call<Vector3>("getPlayerAngles")) * 1000000), // end point
+                    new Parameter(ADMIN)); // ignore entity
+            });
+        }
+        void test()
+        {
+            //ADMIN.SetField("sessionteam", "allies");
+            //ADMIN.Notify("menuresponse", "team_marinesopfor", "allies");
+            //ADMIN.Call("closePopupMenu");
+            //Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
+            //Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
+
+            var deathCount = ADMIN.GetField<int>("deaths");
+            print(deathCount);
+
+        }
         //Entity JJUG_BOT,HELLI_BOT;
 
         /*
-        1번 저거넛 봇
+        1번 저거넛 봇t
         2번 RPG 봇
         3번 리엇 봇
         4번 인간
