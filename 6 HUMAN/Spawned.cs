@@ -10,58 +10,64 @@ namespace Infected
 {
     public partial class Infected
     {
-
         void human_spawned(Entity player)
         {
-            var deathCount = ADMIN.GetField<int>("deaths");
-            if (deathCount < 3)
-            {
-                player.Call("playlocalsound", "mp_last_stand"); 
-                player.AfterDelay(500, p =>
-                {
-                    player.SetField("sessionteam", "allies");
-                    player.Notify("menuresponse", "team_marinesopfor", "allies");
-                    player.Call("closePopupMenu");
-                    Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
-                    Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
-                    player.Call("iPrintlnBold", "^2[ ^7GRACE ^2] ONE LIFE MORE");
-                 
-                    giveWeaponTo(player, GetRandomWeapon());
-                });
+            var LIFE = player.GetField<int>("LIFE");
 
-                return;
+            if (LIFE == 0)//LIFE 1 more time
+            {
+                player.SetField("LIFE", 1);
+               
+                player.Call("playlocalsound", "mp_last_stand");
+                player.SetField("sessionteam", "allies");
+                player.Notify("menuresponse", "team_marinesopfor", "allies");
+                player.Call("closePopupMenu");
+                Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
+                Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
+
+                player.Call("iPrintlnBold", "^2[ ^71 LIFE ^2] MORE");
             }
-
-            var aw = player.GetField<int>("AX_WEP");
-            if (aw == 0)
+            else if (LIFE == 1)//Imediatley After Change Team, give a new random weapon
             {
-                var fail_count = player.GetField<int>("FAIL_COUNT");
-                if (fail_count >1)
+                player.AfterDelay(100, x =>
                 {
-                    AxisWeapon_by_init(player);
-                    return;
-                }
+                    giveWeaponTo(player, GetRandomWeapon());
+                    player.SetField("LIFE", 2);
+                });
+            }
+            else if (LIFE == 2)//change to AXIS
+            {
+                player.SetField("LIFE",3);
+                player.SetField("sessionteam", "axis");
+                human_List.Remove(player);
                 player.SetField("AX_WEP", 1);
-                player.SetField("FAIL_COUNT", fail_count+1);
                 player.Call("suicide");
                 player.Notify("menuresponse", "changeclass", "axis_recipe4");
-
             }
-            else if (aw == 1)
+            else 
+            {            
+                dead_spawned(player);
+            }
+        }
+        void dead_spawned(Entity player)
+        {
+            var aw = player.GetField<int>("AX_WEP");
+
+            if (aw == 1)
             {
                 AxisHud(player);
                 Utilities.RawSayTo(player, "^2[ ^7DISABLED ^2] Melee of the Infected");
 
                 AxisWeapon_by_init(player);
-
             }
             else
             {
-                var byAttack = player.GetField<bool>("byAttack");
+                var bySuicide = player.GetField<int>("bySuicide");
 
-                if (byAttack) AxisWeapon_by_Attack(player, aw);
-                else AxisWeapon_by_init(player);
+                if (bySuicide==1) AxisWeapon_by_init(player); 
+                else AxisWeapon_by_Attack(player, aw);
             }
+
         }
         /// <summary>
         /// 죽은 사람 무기 초기화
@@ -71,9 +77,9 @@ namespace Infected
         string DEAD_GUN = "iw5_deserteagle_mp_tactical";
         void AxisWeapon_by_init(Entity dead)
         {
+            dead.SetField("AX_WEP", 2);
+
             dead.TakeWeapon(dead.CurrentWeapon);
-            //dead.SetPerk(P.PL[0], true, true);
-            //dead.SetPerk(P.CL[0], true, true);
             dead.GiveWeapon(DEAD_GUN);
             dead.AfterDelay(100, d =>
             {
@@ -85,7 +91,7 @@ namespace Infected
             AfterDelay(t2, () => dead.Notify("open_"));
 
         }
- 
+
         /// <summary>
         /// 감염자가 계속 죽을 경우 총기를 주는 어드밴티지를 줌.
         /// </summary>
@@ -99,73 +105,69 @@ namespace Infected
 
             string deadManWeapon = "";
             int bullet = 0;
-            if (aw <3)
-            {
-                deadManWeapon = _launcherList[0];
-                bullet = 1;
-            }
-            else if (aw ==3)
+            if (aw < 3)
             {
                 deadManWeapon = _launcherList[1];
                 bullet = 1;
             }
-            else if (aw==4)
+            else if (aw == 3)
             {
                 deadManWeapon = _launcherList[2];
                 bullet = 1;
             }
-            else if (aw ==5)
+            else if (aw == 4)
             {
-                deadManWeapon = _launcherList[3];
+                deadManWeapon = "iw5_mp412_mp";
+                bullet = 1;
+            }
+            else if (aw == 5)
+            {
+                deadManWeapon = "iw5_44magnum_mp";
                 bullet = 1;
             }
             else if (aw == 6)
             {
-                dead.Health = 50;
                 deadManWeapon = _sniperList[1];
                 bullet = 1;
             }
-            else if (aw ==7)
+            else if (aw == 7)
             {
-                dead.Health = 50;
                 deadManWeapon = _sniperList[4];
                 bullet = 1;
             }
             else if (aw == 8)
             {
-                dead.Health = 50;
                 deadManWeapon = _sniperList[5];
+                bullet = 1;
             }
             else if (aw == 9)
             {
-                dead.Health = 50;
-                deadManWeapon = _arList[10];//10
+                deadManWeapon = _arList[0];//10
                 bullet = 4;
             }
             else if (aw == 10)
             {
-                dead.Health = 50;
                 deadManWeapon = _lmgList[2];//10
                 bullet = 6;
             }
             else
             {
                 AxisWeapon_by_init(dead);
-                dead.Call("iPrintlnBold", "^2[ ^7NO UPGRADE ^2] Weapon of the Infected");
+                dead.Call("iPrintlnBold", "^2[ ^7AGAIN ^2] Init Weapon of the Infected");
                 return;
             }
 
             dead.GiveWeapon(deadManWeapon);
-            dead.SwitchToWeaponImmediate(deadManWeapon);
-           
-            dead.Call("SetWeaponAmmoStock", DEAD_GUN, 0);
-            dead.Call("SetWeaponAmmoClip", DEAD_GUN, bullet);
+            dead.AfterDelay(100, x =>
+            {
+                dead.SwitchToWeaponImmediate(deadManWeapon);
+
+                dead.Call("SetWeaponAmmoStock", deadManWeapon, 0);
+                dead.Call("SetWeaponAmmoClip", deadManWeapon, bullet);
+            });
 
             dead.Call("iPrintlnBold", "^2[ ^7" + deadManWeapon + " ^2] Weapon of the Infected");
             dead.Notify("open_");
-            AfterDelay(2000, () => dead.Call("iPrintlnBold", "^2[ ^71 DEATH ^2] Remaining of Upgrade Weapon"));
         }
-
-
     }
 }

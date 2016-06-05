@@ -19,6 +19,7 @@ namespace Infected
         {
             if (i > 10 || i<0) return;
             i -= 1;
+            print(player.Name + " perk count : " + i);
 
             HudElem PH = HudElem.NewClientHudElem(player);
             PH.Foreground = true;

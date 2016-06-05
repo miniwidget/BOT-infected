@@ -29,7 +29,7 @@ namespace Infected
             player.TakeWeapon(player.CurrentWeapon);
             player.GiveWeapon(weapon);
             player.Call("givemaxammo", weapon);
-            player.SwitchToWeaponImmediate(weapon);
+            player.AfterDelay(100,x=>player.SwitchToWeaponImmediate(weapon));
         }
 
         string AP() { return _autoPistolList[rnd.Next(4)]; }

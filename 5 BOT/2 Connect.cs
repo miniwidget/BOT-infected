@@ -29,7 +29,6 @@ namespace Infected
                 return;
             }
 
-            bot.Call("suicide");
             bot.Notify("menuresponse", "changeclass", BOTs_CLASS[i]);
 
             //IMPORTANT
@@ -112,13 +111,13 @@ namespace Infected
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx);
+                    changeBotClass(first_Inf_BOT, fidx,true);
                     return false;
                 }
 
                 if (i != fidx)
                 {
-                    changeBotClass(BOTs_List[i], i);
+                    changeBotClass(BOTs_List[i], i,false);
                 }
 
                 i++;
@@ -146,7 +145,7 @@ namespace Infected
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx);
+                    changeBotClass(first_Inf_BOT, fidx,true);
                     int axis=0,surv=0;
                     foreach (Entity bot in BOTs_List)
                     {
@@ -172,7 +171,7 @@ namespace Infected
                     return true;// 살려 놓은 봇 , 첫 감염자 봇
                 }
 
-                changeBotClass(BOTs_List[i], i);
+                changeBotClass(BOTs_List[i], i, false);
                 if (TEST_) print(BOTs_List[i].Name + "//" + i);
                 i++;
                 return true;
@@ -184,11 +183,11 @@ namespace Infected
         /// </summary>
         void BotSuicideAll(Entity player)
         {
-            if (HUMAN_COUNT == 1)
-            {
-                deplayBOTs_map_init(false, "^2GAME RESTART ^7in 8 seconds", 8);
-                return;
-            }
+            //if (HUMAN_COUNT == 1)
+            //{
+            //    deplayBOTs_map_init(false, "^2GAME RESTART ^7in 5 seconds", 5);
+            //    return;
+            //}
             print("■ ■ BotSuicideAll. HUMAN : " + HUMAN_COUNT);
             print("■ ■ Inf : " + player.Name );
 
@@ -198,13 +197,13 @@ namespace Infected
             {
                 if (i == max) return false;
 
-                changeBotClass(BOTs_List[i], i);
+                changeBotClass(BOTs_List[i], i,false);
                 i++;
                 return true;
             });
         }
 
-        void changeBotClass(Entity bot, int i)
+        void changeBotClass(Entity bot, int i,bool change)
         {
 
             if (i == 1 || i == 2)//1=RPG BOT 2=RIOT
@@ -221,9 +220,8 @@ namespace Infected
             if (!SUICIDE_BOT_) return;
 
             bot.Call("suicide");
-            bot.Notify("menuresponse", "changeclass", BOTs_CLASS[i]);
+            if (change) setTeamName();
         }
-
 
     }
 }

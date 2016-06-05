@@ -55,7 +55,6 @@ namespace Infected
                     var i = pc + 1;
                     attacker.SetField("PERK", i);
 
-                    print(attacker.Name + " perk count : " + i / 3);
                     if (i >2 && i % 3 == 0)
                     {
                         attacker.Call(33466, "mp_killstreak_radar");//playlocalsound
@@ -77,9 +76,9 @@ namespace Infected
                 }
 
                 if (killed == attacker)
-                    killed.SetField("byAttack", false);//공격으로 죽음
+                    killed.SetField("bySuicide", 1);//공격으로 죽음
                 else
-                    killed.SetField("byAttack", true);//자살로 죽음
+                    killed.SetField("bySuicide", 0);//자살로 죽음
             }
 
         }

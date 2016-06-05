@@ -54,12 +54,12 @@ namespace Infected
             staticBG.Foreground = true;
             staticBG.HideWhenInMenu = false;
             staticBG.Alpha = 0;
-            staticBG.Call("fadeovertime", 5f);
+            staticBG.Call("fadeovertime", 2f);
             staticBG.Alpha = 1f;
 
             int transitiontime = 100;
-            int duration = 8000;
-            int decayduration = 2000;
+            int duration = 5000;
+            int decayduration = 1000;
 
             HudElem END = HudElem.CreateServerFontString("default", 2f);
             END.SetPoint("CENTER", "CENTER", 0, 100);

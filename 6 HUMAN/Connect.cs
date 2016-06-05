@@ -35,9 +35,9 @@ namespace Infected
                 }
             }
 
-            if (HUMAN_COUNT > 8)
+            if (HUMAN_COUNT > 7)
             {
-                Utilities.ExecuteCommand("dropclient " + player.EntRef + "SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 8 HUMANS]");
+                Utilities.ExecuteCommand("dropclient " + player.EntRef + "SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]");
                 return;
             }
             HUMAN_COUNT++;
@@ -46,7 +46,7 @@ namespace Infected
             print(name + " connected ♥");
 
             //IMPORTANT
-            foreach (string f in new string[] { "PERK", "AX_WEP", "byAttack", "FAIL_COUNT"})
+            foreach (string f in new string[] { "PERK", "LIFE", "AX_WEP", "bySuicide", "FAIL_COUNT"})
             {
                 player.SetField(f, 0);
             }
@@ -54,20 +54,15 @@ namespace Infected
             if (isSurvivor(player))
             {
                 Client_init_GAME_SET(player);
+                player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
+                player.AfterDelay(500, p => player.SpawnedPlayer += () => human_spawned(player));
             }
             else
             {
-                player.Call("suicide");
+                Utilities.ExecuteCommand("dropclient " + player.EntRef + "Enter the Server Next Round");
             }
 
-            if (!PREMATCH_DONE)
-            {
-                string cls = "allies_recipe" + rnd.Next(1, 6);
-                player.Call("suicide");
-                player.Notify("menuresponse", "changeclass", cls);
-                player.AfterDelay(500, p => player.SpawnedPlayer += () => human_spawned(player));
-            }
-            else player.SpawnedPlayer += () => human_spawned(player);
+            
         }
         void Inf_PlayerDisConnected(Entity player)
         {

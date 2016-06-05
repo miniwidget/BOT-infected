@@ -50,6 +50,11 @@ namespace Infected
 
         #endregion
 
+        void setTeamName()
+        {
+            Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
+            Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
+        }
         void Client_init_GAME_SET(Entity player)
         {
             human_List.Add(player);
