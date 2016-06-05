@@ -56,13 +56,13 @@
     <Compile Include="5 BOT\2 Connect.cs" />
     <Compile Include="6 HUMAN\Connect.cs" />
     <Compile Include="6 HUMAN\Spawned.cs" />
-    <Compile Include="Override\OnSay.cs" />
+    <Compile Include="7 Override\OnSay.cs" />
     <None Include="업데이트할 것들\IAM.cs" />
     <Compile Include="업데이트할 것들\temp.cs" />
-    <Compile Include="Override\OnPlayerKilled.cs" />
+    <Compile Include="7 Override\OnPlayerKilled.cs" />
     <Compile Include="GameSET.cs" />
     <Compile Include="4 PERK\Perk.cs" />
-    <Compile Include="Override\OnSay_Admin.cs" />
+    <Compile Include="7 Override\OnSay_Admin.cs" />
     <Compile Include="2 HUD\HUD.cs" />
     <Compile Include="Main.cs" />
     <None Include="1 MAP\Location.cs" />
@@ -71,9 +71,7 @@
     <None Include="1 MAP\Mapedit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SET\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
