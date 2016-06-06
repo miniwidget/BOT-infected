@@ -7,141 +7,74 @@ using InfinityScript;
 
 namespace Infected
 {
-    public class SHOWINFO
+    public partial class Infected
     {
-        public static void ShowInfoA(Entity ent)
+        string[] MESSAGES_ALLIES_INFO_A =
         {
-            if (ent.GetField<string>("sessionteam") != "axis")
-                goto Survivors;
+             "ATTACHMENT INFORMATION",
+             "^7BIND FOLLOWING KEYS  IF SHOW ^2UNBOUND",
+             "press ^2ESC ^7and goto ^2OPTIONS",
+             "goto ^2CONTROLS ^7 -> ^2MOVEMENT",
+             "bind follwing keys",
+             "1. ^2HOLD CROUCH ^7to any key",
+             "2. ^2HOLD PRONE ^7to any key",
+             "3. ^2CHANGE STANCE ^7to any key"
+        };
+        string[] MESSAGES_ALLIES_INFO_W =
+        {
+            "WEAPON  INFORMATION",
+            "^7TYPE ^2[ ^7FOLLOWING ^2] ^7TO GET WEAPONS",
+            "^2AP ^7| ^2AG ^7| ^2AR ^7| ^2SM ^7| ^2LM ^7| ^2SG ^7| ^2SN",
+            "^2[ ^7AP ^2] TO GET AKIMBO PISTOL",
+            "^2[ ^7AG ^2] TO GET AKIMBO GUN",
+            "^2[ ^7AR ^2] TO GET ASSAULT RIFFLE",
+            "^2[ ^7SM ^2] TO GET SUB MACHINE GUN",
+            "^2[ ^7LM ^2] TO GET LIGHT MACHINE GUN",
+            "^2[ ^7SN ^2] TO GET SNIPE GUN",
+            "^2[ ^7SG ^2] TO GET SHOT GUN",
+        };
+        string[] MESSAGES_AXIS_INFO_W =
+        {
+            "^7TYPE ^2[ ^7FOLLOWING ^2] ^7TO GET WEAPONS",
+            "^2[ ^7RIOT ^2] TO GET RIOTSHIELD",
+            "^2[ ^7STINGER ^2] TO GET STINGER",
 
-            ent.Call("iPrintlnBold", "TYPE  FOLLOWING");
-            ent.AfterDelay(4000, Ent =>
+        };
+
+        void ShowInfoA(Entity ent)
+        {
+            if (!isSurvivor(ent))
             {
-                Ent.Call("iPrintlnBold", "^2[ ^7LOC ^2]  TO LOCATE INITIAL POSITION");
-                Ent.AfterDelay(4000, Ent2 =>
-                {
-                    Ent2.Call("iPrintlnBold", "^2[ ^7SC ^2]  TO SUICIDE");
-                   
-                });
+                ent.Call("iPrintlnBold", "NO FUNCTION. BYE");
+                return;
+            }
 
-            });
-
-            return;
-        Survivors:
-
-            ent.Call("iPrintlnBold", "ATTACHMENT INFORMATION");
-            ent.AfterDelay(4000, entity =>
-            {
-                entity.Call("iPrintlnBold", "^7BIND FOLLOWING KEYS  IF SHOW ^2UNBOUND");
-                entity.AfterDelay(4000, ENt =>
-                {
-                    ENt.Call("iPrintlnBold", "OPTIONS -> CONTROLS->MOVEMENT->^2HOLDPRONE");
-                    ENt.AfterDelay(4000, player =>
-                    {
-                        player.Call("iPrintlnBold", "OPTIONS -> CONTROLS->MOVEMENT->^2CHANGESTANCE");
-                        player.AfterDelay(4000, _Ent =>
-                        {
-                            _Ent.Call("iPrintlnBold", "^2[ ^7[{+prone}] ^2]  SILENCER OR THERMAL");
-                            _Ent.AfterDelay(4000, _Ent2 =>
-                            {
-                                _Ent2.Call("iPrintlnBold", "^2[ ^7[{+stance}] ^2]  C4  |  FRAG  |  SEMTEX");
-                                _Ent2.AfterDelay(4000, _Ent3 =>
-                                {
-                                    _Ent3.Call("iPrintlnBold", "^2[ ^7LOC ^2]  TO LOCATE INITIAL POSITION");
-                                    
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            roopMessage(ent, 0, MESSAGES_ALLIES_INFO_A);
         }
-        public static void ShowInfoW(Entity ent)
+        void ShowInfoW(Entity ent)
         {
-            if (ent.GetField<string>("sessionteam") != "axis")
-                goto Survivors;
+            if (isSurvivor(ent))
 
-            ent.Call("iPrintlnBold", "TYPE  FOLLOWING");
-            ent.AfterDelay(4000, Ent =>
+                roopMessage(ent, 0, MESSAGES_ALLIES_INFO_W);
+            else
+                roopMessage(ent, 0, MESSAGES_AXIS_INFO_W);
+        }
+
+        void roopMessage(Entity e, int i, string[] lists)
+        {
+            e.Call("iPrintlnBold", lists[i]);
+            i++;
+            if (i == lists.Length) return;
+            e.AfterDelay(4000, e1 =>
             {
-                Ent.Call("iPrintlnBold", "^2[ ^7RIOT ^2] TO GET RIOTSHIELD");
-                Ent.AfterDelay(4000, Ent2 =>
-                {
-                    Ent2.Call("iPrintlnBold", "^2[ ^7STINGER ^2] TO GET STINGER");
-                    Ent2.AfterDelay(4000, Ent3 =>
-                    {
-                        Ent3.Call("iPrintlnBold", "STINGER CAN BE USED IN 6 SECONDS");
-                        Ent3.AfterDelay(4000, Ent4 =>
-                        {
-                            Ent4.Call("iPrintlnBold", "^7BIND FOLLOWING KEYS  IF SHOW ^2UNBOUND");
-                            Ent4.AfterDelay(4000, Ent5 =>
-                            {
-                                Ent5.Call("iPrintlnBold", "OPTIONS -> CONTROLS->MOVEMENT->^2CHANGESTANCE");
-                                Ent5.AfterDelay(4000, Ent6 =>
-                                {
-                                    Ent6.Call("iPrintlnBold", "OPTIONS -> CONTROLS->MOVEMENT->^2HOLDPRONE");
-                                    Ent5.AfterDelay(4000, Ent7 =>
-                                    {
-                                        Ent7.Call("iPrintlnBold", "^2[ ^7[{+stance}] ^2] TO GET BETTY , CLAYMORE");
-                                        Ent7.AfterDelay(4000, Ent8 =>
-                                        {
-                                            Ent8.Call("iPrintlnBold", "^2[ ^7[{+prone}] ^2] TO GET THROWING KNIFE");
-
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-
+                roopMessage(e, i, lists);
             });
+            
+        }
 
-            return;
-        Survivors:
-            ent.Call("iPrintlnBold", "WEAPON  INFORMATION");
-            ent.AfterDelay(4000, entity =>
-            {
-                entity.Call("iPrintlnBold", "^7TYPE FOLLOWING TO GET WEAPONS");
-                entity.AfterDelay(4000, ENt =>
-                {
-                    ENt.Call("iPrintlnBold", "^2AP ^7| ^2AK ^7| ^2AR ^7| ^2SM ^7| ^2MG ^7| ^2SN");//| holdstrafe | changestance ]");
-
-                    ENt.AfterDelay(4000, player =>
-                    {
-                        player.Call("iPrintlnBold", "^2[ ^7AP ^2] TO GET AUTOMATIC PISTOL");
-
-                        player.AfterDelay(4000, _Ent =>
-                        {
-                            _Ent.Call("iPrintlnBold", "^2[ ^7AK ^2] TO GET AKIMBO PISTOL");
-
-                            _Ent.AfterDelay(4000, _Ent2 =>
-                            {
-                                _Ent2.Call("iPrintlnBold", "^2[ ^7AR ^2] TO GET ASSAULT RIFFLE");
-
-                                _Ent2.AfterDelay(4000, _Ent3 =>
-                                {
-                                    _Ent3.Call("iPrintlnBold", "^2[ ^7SM ^2] TO GET SUB MACHINE GUN");
-                                    _Ent3.AfterDelay(4000, _Ent4 =>
-                                    {
-                                        _Ent4.Call("iPrintlnBold", "^2[ ^7LM ^2] TO GET LIGHT MACHINE GUN");
-                                        _Ent4.AfterDelay(4000, _Ent5 =>
-                                        {
-                                            _Ent5.Call("iPrintlnBold", "^2[ ^7SN ^2] TO GET SNIPE GUN");
-                                            _Ent5.AfterDelay(4000, _Ent6 =>
-                                            {
-                                                _Ent6.Call("iPrintlnBold", "REMAININGS ARE AT RIGHT GUIDE MENU");
-
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-
-                        });
-                    });
-                });
-            });
+        void showMessage(Entity e, string message)
+        {
+            e.Call("iPrintlnBold", message);
         }
     }
 }

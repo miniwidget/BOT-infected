@@ -238,6 +238,7 @@ namespace Infected
 
             switch (text)
             {
+                case "h2":helicopter2(ADMIN);break;
                 case "test": test(); return false;
 
                 case "pos": moveBot(null); return false;
@@ -266,6 +267,7 @@ namespace Infected
                 var value = t[1];
                 switch (txt)
                 {
+                    case "w": test(value); break;
                     case "pos": moveBot(value); break;
 
                     case "bot": DeployBOTsByNUM(int.Parse(value)); return false;

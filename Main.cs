@@ -66,7 +66,6 @@ namespace Infected
 
             Server_SetDvar();
 
-            char[] numChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             PlayerConnecting += (player) =>
             {
                 if (PREMATCH_DONE) return;
@@ -74,7 +73,7 @@ namespace Infected
                 if (name.StartsWith("bot"))
                 {
                     Call("kick", player.EntRef);
-                    if (TEST_) print(name + "KICKED★");
+                    //if (TEST_) print(name + "KICKED★");
                 }
             };
             PlayerConnected += (player) =>
@@ -86,7 +85,7 @@ namespace Infected
                     if (!PREMATCH_DONE)
                     {
                         Call("kick", player.EntRef);
-                        if (TEST_) print("BOT" + player.EntRef + " kicked before PMCH");
+                        //if (TEST_) print("BOT" + player.EntRef + " kicked before PMCH");
                         return;
                     }
                     Bot_Connected(player);

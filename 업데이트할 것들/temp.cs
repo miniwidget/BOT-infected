@@ -22,16 +22,96 @@ namespace Infected
         }
         void test()
         {
-            //ADMIN.SetField("sessionteam", "allies");
-            //ADMIN.Notify("menuresponse", "team_marinesopfor", "allies");
-            //ADMIN.Call("closePopupMenu");
-            //Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
-            //Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
-
+            ADMIN.Call("loadfx", "misc/flares_cobra");
             var deathCount = ADMIN.GetField<int>("deaths");
             print(deathCount);
 
         }
+        void test(string weapon)
+        {
+            string currentWeapon = ADMIN.CurrentWeapon;
+            print(currentWeapon);
+
+            ADMIN.TakeWeapon(currentWeapon);
+            ADMIN.GiveWeapon(weapon);
+            ADMIN.SwitchToWeaponImmediate(weapon);
+        }
+        void helicopter_wait_anotherPlayer(Entity player)
+        {
+            Entity LB = Call<Entity>(369, player, player.Origin, player.GetField<Vector3>("angles"), "littlebird_mp", "vehicle_little_bird_armed");
+        }
+        void helicopter2(Entity player)
+        {
+            Restore(player, true); 
+
+            string[] tag = { "tag_player", "tag_light_belly", "tag_origin", "tag_minigun_attach_left" };
+
+            //spawn LB & turret
+            var origin = player.Origin;
+            origin.Z += 0;
+            Entity LB = Call<Entity>(369, player, origin,player.GetField<Vector3>("angles"), "littlebird_mp", "vehicle_little_bird_armed");
+            Entity turret = Call<Entity>(19, "misc_turret", player.Origin, "littlebird_guard_minigun_mp", false);
+            turret.Call(32841, LB, tag[3], new Vector3(30, 30, 0), new Vector3(0, 0, 0));
+            turret.Call(32929, "mp_remote_turret");//setmodel mp_remote_turret
+            turret.Call(32942);//MakeUnusable
+            turret.Call(33052);//maketurretsolid
+            turret.Call(33417, true);//setcandamage
+
+            //player side
+            giveWeaponTo(player, "mortar_remote_zoom_mp");
+
+            player.Call(33503);//disableoffhandweapons
+            player.Notify("using_remote");
+
+            player.Call(33256, LB);//remotecontrolvehicle
+            player.Call(32979, turret);//remotecontrolturret
+
+            player.AfterDelay(60000, e =>
+            {
+                player.Call(32843);//unlink
+                player.Call(33257);//remotecontrolvehicleoff
+                player.Call(32980);//remotecontrolturretoff
+                turret.Call(32928);//delete
+                LB.Call(32923);//stoploopsound
+
+                LB.Call(33413, Call<Vector3>(251, LB.Origin), 100, 4, 2);//vibrate
+
+                LB.AfterDelay(2000, ex =>
+                {
+                    Call(304, 96, LB.Origin);//playfx
+
+                    LB.Call(32915, "cobra_helicopter_crash");//playsound
+
+                    LB.Call(32928);//delete
+
+                });
+                Restore(player, false);
+            });
+
+            // lbSupport_lightFX(LB);
+        }
+        void Restore(Entity player, bool enabled)
+        {
+
+            if (enabled)
+            {
+                player.SetField("restoreWeapon", player.CurrentWeapon);
+                player.SetField("pos", player.Origin);
+
+            }
+            else
+            {
+                player.Call(32935);
+
+                if (!isSurvivor(player)) return;
+
+                player.Call(33529, player.GetField<Vector3>("pos"));
+
+                giveWeaponTo(player, player.GetField<string>("restoreWeapon"));
+            }
+        }
+
+
         //Entity JJUG_BOT,HELLI_BOT;
 
         /*

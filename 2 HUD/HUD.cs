@@ -48,7 +48,7 @@ namespace Infected
             });
         }
 
-        void AlliesHud(Entity player)
+        void AlliesHud(Entity player,string offhand)
         {
             HudElem allies_info_hud = HudElem.CreateFontString(player, "hudbig", 0.4f);
             allies_info_hud.X = 740;
@@ -65,7 +65,7 @@ namespace Infected
             allies_weap_hud.HideWhenInMenu = true;
             allies_weap_hud.Foreground = false;
             allies_weap_hud.Alpha = 0f;
-            allies_weap_hud.SetText( "^7type following\n^2ap ^7akimbo pistol\n^2ag ^7akimbo gun\n^2ar ^7assau riffle\n^2sm ^7sub m_gun\n^2lm ^7light m_gun\n^2st ^7shot gun\n^2sn ^7snipe gun\n\n^7bind key at option\n^2[{+prone}] ^7attatchment\n^2[{+stance}] ^7frag sem c4" );
+            allies_weap_hud.SetText("^7type following\n^2ap ^74 akimbo pistol\n^2ag ^76 akimbo gun\n^2ar ^79 assau riffle\n^2sm ^76 sub m_gun\n^2lm ^75 light m_gun\n^2sg ^74 shot gun\n^2sn ^76 snipe gun\n\n^7bind key at option\n^2[{+movedown}] ^7viewscope\n^2[{+prone}] ^7attatchment\n^2[{+stance}] ^7" + offhand);
 
             allies_info_hud.Alpha = 0.8f; allies_weap_hud.Alpha = 0.6f;
             allies_weap_hud.Call("moveovertime", 2f);
@@ -78,12 +78,6 @@ namespace Infected
             {
                 allies_info_hud.Call("destroy"); allies_weap_hud.Call("destroy");
             });
-
-            AfterDelay(t5, () =>
-            {
-                if (!isSurvivor(player)) player.Notify("CLOSE");
-            });
-
         }
 
         void AxisHud(Entity player)
@@ -100,7 +94,7 @@ namespace Infected
             axis_weap_hud.HideWhenInMenu = true;
             axis_weap_hud.Foreground = false;
             axis_weap_hud.Alpha = 0f;
-            axis_weap_hud.SetText("^7type following\n\n^2infow ^7weapon info\n^2sc ^7 suicide\n^2riot ^7 riotshield\n^2stinger ^7stinger\n\n^7bind key at option\n\n^2[{+prone}] ^7 throwingknife\n^2[{+stance}] ^7 bouncingbetty\n^2[{+stance}] ^7 claymore");
+            axis_weap_hud.SetText("^7type following\n\n^2infow ^7weapon info\n^2sc ^7 suicide\n^2riot ^7 riotshield\n^2stinger ^7stinger\n\n^7bind key at option\n\n^2[{+movedown}] ^7 throwingknife\n^2[{+prone}] ^7 bouncingbetty\n^2[{+stance}] ^7 claymore");
 
             player.OnNotify("open_", entity => axis_weap_hud.Alpha = 0.6f);
             player.OnNotify("close_", entity => axis_weap_hud.Alpha = 0f);

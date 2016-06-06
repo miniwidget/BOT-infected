@@ -10,23 +10,26 @@ namespace Infected
 {
     public partial class Infected
     {
-     
+
         void Inf_PlayerConnected(Entity player)
         {
 
             string name = player.Name;
-            int i = 0;
-
-            bool isEndwithNum = int.TryParse(name[name.Length - 1].ToString(), out i);
-
-            if (name.StartsWith("bot") && isEndwithNum)
+           
+            if (name.StartsWith("bot") )
             {
-                Bot_Connected(player);
-                return;
+                int i = 0;
+                bool isEndwithNum = int.TryParse(name[name.Length - 1].ToString(), out i);
+                if (isEndwithNum)
+                {
+                    Bot_Connected(player);
+                    return;
+                }
             }
 
             if (player.Name == ADMIN_NAME)
             {
+
                 ADMIN = player;
                 if (TEST_)
                 {
@@ -35,44 +38,31 @@ namespace Infected
                 }
             }
 
-            if (HUMAN_COUNT > 7)
+            if (human_List.Count > 7)
             {
                 Utilities.ExecuteCommand("dropclient " + player.EntRef + "SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]");
                 return;
             }
-            HUMAN_COUNT++;
-            if (!HUMAN_CONNECTED_) HUMAN_CONNECTED_ = true;
-
-            print(name + " connected ♥");
-
-            //IMPORTANT
-            foreach (string f in new string[] { "PERK", "LIFE", "AX_WEP", "bySuicide", "FAIL_COUNT"})
-            {
-                player.SetField(f, 0);
-            }
 
             if (isSurvivor(player))
             {
+                if (!HUMAN_CONNECTED_) HUMAN_CONNECTED_ = true;
+                print(name + " connected ♥");
                 Client_init_GAME_SET(player);
-                player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
-                player.AfterDelay(500, p => player.SpawnedPlayer += () => human_spawned(player));
             }
             else
             {
                 Utilities.ExecuteCommand("dropclient " + player.EntRef + "Enter the Server Next Round");
             }
 
-            
         }
         void Inf_PlayerDisConnected(Entity player)
         {
-            // 봇 타겟리스트에서 접속 끊은 사람 제거
-            if (human_List.Contains(player))
+            if (human_List.Contains(player))// 봇 타겟리스트에서 접속 끊은 사람 제거
             {
                 human_List.Remove(player);
-                HUMAN_COUNT--;
             }
-            if (HUMAN_COUNT == 0 && !GAME_ENDED_) HUMAN_CONNECTED_ = false;
+            if (human_List.Count == 0 && !GAME_ENDED_) HUMAN_CONNECTED_ = false;
         }
 
     }

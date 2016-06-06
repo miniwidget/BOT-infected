@@ -23,11 +23,12 @@ namespace Infected
         {
             if (BOTs_List.Count >= 10) return;
 
+            int fail_count=0;
             OnInterval(250, () =>
             {
                 if (OVERFLOW_BOT_) return false;
                 if (BOTs_List.Count > 10) return false;
-                if (FAIL_COUNT > 5)
+                if (fail_count > 5)
                 {
                     deplayBOTs_map_init(true, "SOMETHING WRONG HAPPEND.RESTART MAP in 5 seconds",5);
                     return false;
@@ -36,7 +37,7 @@ namespace Infected
 
                 if (b == null)
                 {
-                    FAIL_COUNT++;
+                    fail_count++;
                     return true;
                 }
                 return true;
@@ -46,7 +47,7 @@ namespace Infected
         void deplayBOTs_map_init(bool wrong,string message,int sec)//
         {
             if(wrong) KickBOTsAll();
-            // Call("iPrintlnBold", "");
+
             HudElem staticBG = HudElem.NewHudElem();
             staticBG.HorzAlign = "fullscreen";
             staticBG.VertAlign = "fullscreen";

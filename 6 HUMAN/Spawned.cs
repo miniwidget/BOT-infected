@@ -22,16 +22,14 @@ namespace Infected
                 player.SetField("sessionteam", "allies");
                 player.Notify("menuresponse", "team_marinesopfor", "allies");
                 player.Call("closePopupMenu");
-                Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
-                Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
-
+                setTeamName();
                 player.Call("iPrintlnBold", "^2[ ^71 LIFE ^2] MORE");
             }
             else if (LIFE == 1)//Imediatley After Change Team, give a new random weapon
             {
                 player.AfterDelay(100, x =>
                 {
-                    giveWeaponTo(player, GetRandomWeapon());
+                    giveWeaponTo(player, getRandomWeapon());
                     player.SetField("LIFE", 2);
                 });
             }
@@ -43,9 +41,10 @@ namespace Infected
                 player.SetField("AX_WEP", 1);
                 player.Call("suicide");
                 player.Notify("menuresponse", "changeclass", "axis_recipe4");
+                print(player.Name + " : Infected ⊙..⊙");
             }
             else 
-            {            
+            {
                 dead_spawned(player);
             }
         }
@@ -62,9 +61,9 @@ namespace Infected
             }
             else
             {
-                var bySuicide = player.GetField<int>("bySuicide");
+                var BY_SUICIDE = player.GetField<int>("BY_SUICIDE");
 
-                if (bySuicide==1) AxisWeapon_by_init(player); 
+                if (BY_SUICIDE==1) AxisWeapon_by_init(player); 
                 else AxisWeapon_by_Attack(player, aw);
             }
 
@@ -107,12 +106,12 @@ namespace Infected
             int bullet = 0;
             if (aw < 3)
             {
-                deadManWeapon = _launcherList[1];
+                deadManWeapon = LAUNCHER_LIST[1];
                 bullet = 1;
             }
             else if (aw == 3)
             {
-                deadManWeapon = _launcherList[2];
+                deadManWeapon = LAUNCHER_LIST[2];
                 bullet = 1;
             }
             else if (aw == 4)
@@ -127,27 +126,27 @@ namespace Infected
             }
             else if (aw == 6)
             {
-                deadManWeapon = _sniperList[1];
+                deadManWeapon = SNIPE_LIST[1];
                 bullet = 1;
             }
             else if (aw == 7)
             {
-                deadManWeapon = _sniperList[4];
+                deadManWeapon = SNIPE_LIST[4];
                 bullet = 1;
             }
             else if (aw == 8)
             {
-                deadManWeapon = _sniperList[5];
+                deadManWeapon = SNIPE_LIST[5];
                 bullet = 1;
             }
             else if (aw == 9)
             {
-                deadManWeapon = _arList[0];//10
+                deadManWeapon = AR_LIST[0];//10
                 bullet = 4;
             }
             else if (aw == 10)
             {
-                deadManWeapon = _lmgList[2];//10
+                deadManWeapon = LMG_LIST[2];//10
                 bullet = 6;
             }
             else

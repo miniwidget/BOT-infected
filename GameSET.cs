@@ -16,16 +16,15 @@ namespace Infected
             TEAMNAME_ALLIES,
             TEAMNAME_AXIS,
             GAMETYPE = "infect",
-            OFF_HAND,
             MAP_NAME,
-			WELLCOME_MESSAGE,
+            WELLCOME_MESSAGE,
             NEXT_MAP;
         bool
             TEST_ = false,
 
             USE_ADMIN_SAFE_ = false,
             DEPLAY_BOT_,
-            SUICIDE_BOT_=true,
+            SUICIDE_BOT_ = true,
             Disable_Melee_,
 
             GAME_ENDED_,
@@ -40,13 +39,12 @@ namespace Infected
 
         int
             t0 = 100, t1 = 1000, t2 = 2000, t3 = 3000, t5 = 5000,
-            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME,
-            FAIL_COUNT,
-            HUMAN_COUNT;
+            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME;
 
         Entity ADMIN;
 
         Random rnd = new Random();
+        char[] numChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
         #endregion
 
@@ -55,9 +53,17 @@ namespace Infected
             Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
             Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
         }
+
         void Client_init_GAME_SET(Entity player)
         {
+            //IMPORTANT
+            foreach (string f in new string[] { "PERK", "LIFE", "ATTACHMENT", "AX_WEP", "BY_SUICIDE", "FAIL_COUNT" })
+            {
+                player.SetField(f, 0);
+            }
+
             human_List.Add(player);
+            ATT_List.Add(new Attach());
 
             #region SetClientDvar
 
@@ -86,123 +92,68 @@ namespace Infected
 
             #region notifyonplayercommand
 
-            OFF_HAND = player.Call<string>("getcurrentoffhand");
-
             player.Call("notifyonplayercommand", "+TAB", "+scores");
             player.Call("notifyonplayercommand", "-TAB", "-scores");
-            player.Call("notifyonplayercommand", "+throw", "+frag");
-            player.Call("notifyonplayercommand", "-throw", "-frag");
-            player.Call("notifyonplayercommand", "prone", "+prone");
-            player.Call("notifyonplayercommand", "stance", "+stance");
-            player.Call("notifyonplayercommand", "+aa", "+scores");
-            player.Call("notifyonplayercommand", "-aa", "-scores");
+            player.Call("notifyonplayercommand", "HOLD_CROUCH", "+movedown");
+            player.Call("notifyonplayercommand", "HOLD_PRONE", "+prone");
+            player.Call("notifyonplayercommand", "HOLD_STANCE", "+stance");
 
-            player.OnNotify("prone", ent =>
+            player.OnNotify("HOLD_CROUCH", ent =>//view scope
             {
-                if (isSurvivor(ent))
+                if (!isSurvivor(player))
                 {
-                    switch (rnd.Next(2))
-                    {
-                        case 0: Silencer(ent); break;
-                        case 1: Thermal(ent); break;
-                    }
+                    giveOffhandWeapon(player, "throwingknife");
+                    return;
                 }
-                if (isSurvivor(ent))
-                {
-                    player.Call("setoffhandprimaryclass", "throwingknife");
-                    player.GiveWeapon("throwingknife_mp");
-                    player.Call("setweaponammoclip", "throwingknife_mp", 1);
-                }
+
+                giveAttachScope(player);
 
             });
-            player.OnNotify("stance", ent =>
+
+            player.OnNotify("HOLD_PRONE", ent =>//attachment silencer heartbeat,
             {
-                if (isSurvivor(player))
+                if (!isSurvivor(player))
                 {
-                    switch (rnd.Next(3))
-                    {
-                        case 0:
-                            player.GiveWeapon("c4_mp");
-                            player.SwitchToWeapon("c4_mp");
-                            player.Call("iPrintlnBold", "^2[ ^7DEPLOY ^2| ^7FIRE ^2] RIGHT  LEFT^7Mouse botton");
-                            break;
-
-                        case 1:
-                            player.GiveWeapon("frag_grenade_mp");
-                            player.SwitchToWeapon("frag_grenade_mp");
-                            player.Call("iPrintlnBold", "^2[ ^7THROW ^2] ^2LEFT^7Mouse botton");
-                            break;
-                        case 2:
-                            player.GiveWeapon("semtex_mp");
-
-                            break;
-
-                    }
-                    switch (rnd.Next(2))
-                    {
-                        case 0:
-                            player.GiveWeapon("bouncingbetty_mp");
-                            player.Call("setweaponammoclip", "bouncingbetty_mp", 1);
-                            break;
-
-                        case 1:
-                            player.GiveWeapon("claymore_mp");
-                            player.Call("setweaponammoclip", "claymore_mp", 1);
-                            break;
-                    }
+                    giveOffhandWeapon(player, "bouncingbetty_mp");
+                    return;
                 }
+                giveAttachHeartbeat(player);
             });
 
-            player.OnNotify("fly", (ent) =>
+            string offhand = "";
+            switch (rnd.Next(1))
             {
-                ent.SetClientDvar("cg_thirdperson", "0");
-                ent.SetClientDvar("camera_thirdPerson", "0");
+                case 0: offhand = "frag_grenade_mp"; break;
+                case 1: offhand = "c4_mp"; break;
+                case 2: offhand = "semtex_mp"; break;//OK
+                case 3: offhand = "bouncingbetty_mp"; break;//OK
+                case 4: offhand = "claymore_mp"; break;//OK
+            }
 
-                if (player.GetField<string>("sessionstate") != "spectator")
+            player.OnNotify("HOLD_STANCE", ent =>//offhand weapon
+            {
+                //player.TakeWeapon(player.Call<string>("getcurrentoffhand"));
+                if (!isSurvivor(player))
                 {
-                    player.Call("allowspectateteam", "freelook", true);
-                    player.SetField("sessionstate", "spectator");
+                    giveOffhandWeapon(player, "claymore_mp");
+                    return;
                 }
-                else
-                {
-                    player.Call("allowspectateteam", "freelook", false);
-                    player.SetField("sessionstate", "playing");
-                }
+                giveOffhandWeapon(player, offhand);
             });
-
             #endregion
 
-            int standard_time = (int)(PLAYERWAIT_TIME + MATCHSTART_TIME) * 1000;
-            AfterDelay(standard_time, () =>
-            {
-                AlliesHud(player);
-            });
+            giveOffhandWeapon(player, offhand);
+            giveWeaponTo(player, getRandomWeapon());
 
-            AfterDelay(10000, () =>
-            {
-                if (isSurvivor(player)) player.Notify("textDestroy");
-                else player.Notify("open");
+            AlliesHud(player, offhand.Replace("_mp", "").ToUpper());
 
-            });
+            player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
+            player.AfterDelay(500, p => player.SpawnedPlayer += () => human_spawned(player));
 
-            string gun = "";
-            int i = rnd.Next(7);
-            switch (i)
-            {
-                case 0: gun = AP();break;
-                case 1: gun = AG(); break;
-                case 2: gun = AR(); break;
-                case 3: gun = SM(); break;
-                case 4: gun = LM(); break;
-                case 5: gun = SG(); break;
-                case 6: gun = SN(); break;
-            }
-            giveWeaponTo(player, gun);
         }
         void Server_SetDvar()
         {
-            Call("setdvar", "g_TeamName_Allies", TEAMNAME_ALLIES);
-            Call("setdvar", "g_TeamName_Axis", TEAMNAME_AXIS);
+            setTeamName();
 
             Call("setdvar", "scr_player_respawndelay", "2.5f");
             Call("setdvar", "scr_game_allowkillcam", "0");
@@ -213,11 +164,12 @@ namespace Infected
 
             if (TEST_)
             {
-                MATCHSTART_TIME= PLAYERWAIT_TIME = 3;
+                MATCHSTART_TIME = PLAYERWAIT_TIME = 3;
 
                 Utilities.ExecuteCommand("seta g_password \"0\"");
                 print("TEST MODE ===========================");
-            }else
+            }
+            else
             {
 
                 Utilities.ExecuteCommand("seta g_password \"\"");
@@ -237,10 +189,10 @@ namespace Infected
             int index = map_list.IndexOf(MAP_NAME);
             if (index == 35) index = 0;
 
-            NEXT_MAP = map_list[index+1];
+            NEXT_MAP = map_list[index + 1];
             Call("setdvar", "sv_nextmap", NEXT_MAP);
 
-            string content = NEXT_MAP +",bot_infected,1";
+            string content = NEXT_MAP + ",bot_infected,1";
             File.WriteAllText(@"admin\default.dspl", content);
 
             print("현재맵 : " + MAP_NAME + " & " + "다음맵 : " + NEXT_MAP);

@@ -76,9 +76,9 @@ namespace Infected
                 }
 
                 if (killed == attacker)
-                    killed.SetField("bySuicide", 1);//공격으로 죽음
+                    killed.SetField("BY_SUICIDE", 1);//공격으로 죽음
                 else
-                    killed.SetField("bySuicide", 0);//자살로 죽음
+                    killed.SetField("BY_SUICIDE", 0);//자살로 죽음
             }
 
         }

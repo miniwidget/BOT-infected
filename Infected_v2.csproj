@@ -46,10 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="1 MAP\mapModel.cs" />
+    <Compile Include="3 WEAPON\Attach.cs" />
     <Compile Include="4 PERK\Perk_List.cs" />
     <Compile Include="5 BOT\1 DeployBOT.cs" />
-    <None Include="3 WEAPON\Class1.cs" />
     <Compile Include="5 BOT\Cooling.cs" />
     <Compile Include="업데이트할 것들\4 KillstreakBOT.cs" />
     <Compile Include="5 BOT\3 Spawned.cs" />
@@ -65,10 +64,8 @@
     <Compile Include="7 Override\OnSay_Admin.cs" />
     <Compile Include="2 HUD\HUD.cs" />
     <Compile Include="Main.cs" />
-    <None Include="1 MAP\Location.cs" />
     <Compile Include="2 HUD\showinfo.cs" />
     <Compile Include="3 WEAPON\Weapon.cs" />
-    <None Include="1 MAP\Mapedit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
