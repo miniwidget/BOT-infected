@@ -46,7 +46,7 @@ namespace Infected
 
         Random rnd = new Random();
         char[] numChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-
+        string[] CLIENT_FILED = { "PERK", "AX_WEP", "BY_SUICIDE", "FAIL_COUNT" };
         #endregion
 
         void setTeamName()
@@ -58,7 +58,7 @@ namespace Infected
         void Client_init_GAME_SET(Entity player)
         {
             //IMPORTANT
-            foreach (string f in new string[] { "PERK", "AX_WEP", "BY_SUICIDE", "FAIL_COUNT" })
+            foreach (string f in CLIENT_FILED)
             {
                 player.SetField(f, 0);
             }
