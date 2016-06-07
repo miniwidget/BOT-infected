@@ -38,8 +38,9 @@ namespace Infected
             MATCHSTART_TIME;
 
         int
-            t0 = 100, t1 = 1000, t2 = 2000, t3 = 3000, t5 = 5000,
-            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME;
+            t0 = 100, t1 = 1000, t2 = 2000, t3 = 3000, 
+            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME,
+            PLAYER_LIFE;
 
         Entity ADMIN;
 
@@ -57,10 +58,12 @@ namespace Infected
         void Client_init_GAME_SET(Entity player)
         {
             //IMPORTANT
-            foreach (string f in new string[] { "PERK", "LIFE", "ATTACHMENT", "AX_WEP", "BY_SUICIDE", "FAIL_COUNT" })
+            foreach (string f in new string[] { "PERK", "AX_WEP", "BY_SUICIDE", "FAIL_COUNT" })
             {
                 player.SetField(f, 0);
             }
+
+            player.SetField("LIFE", PLAYER_LIFE);
 
             human_List.Add(player);
             ATT_List.Add(new Attach());
@@ -121,7 +124,7 @@ namespace Infected
             });
 
             string offhand = "";
-            switch (rnd.Next(1))
+            switch (rnd.Next(5))
             {
                 case 0: offhand = "frag_grenade_mp"; break;
                 case 1: offhand = "c4_mp"; break;
@@ -153,14 +156,17 @@ namespace Infected
         }
         void Server_SetDvar()
         {
-            setTeamName();
+            string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
+           
+            MAP_NAME = Call<string>("getdvar", "mapname");
+            var map_list = ENTIRE_MAPLIST.Split('|').ToList();
+            int index = map_list.IndexOf(MAP_NAME);
+            if (index == 35) index = 0;
+            //규모 작은 맵 : 0 5 mp_aground_ss mp_burn_ss mp_courtyard_ss 8 mp_hillside_ss 13 mp_nola 21
+            if (new int[] { 0, 5, 8, 13, 21 }.Contains(index)) PLAYER_LIFE = 2; else PLAYER_LIFE = 1;
 
-            Call("setdvar", "scr_player_respawndelay", "2.5f");
-            Call("setdvar", "scr_game_allowkillcam", "0");
-            Call("setdvar", "scr_infect_timelimit", INFECTED_TIMELIMIT);//Call("setdvar", "scr_player_maxhealth", "");Call("setdvar","scr_player_healthregentime","");
-            Call("setdvar", "g_gametype", GAMETYPE);
-
-            Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
+            NEXT_MAP = map_list[index + 1];
+            Call("setdvar", "sv_nextmap", NEXT_MAP);
 
             if (TEST_)
             {
@@ -173,25 +179,24 @@ namespace Infected
             {
 
                 Utilities.ExecuteCommand("seta g_password \"\"");
-                readMap();
+                writrMAP();
             }
 
             Call("setdvar", "scr_game_playerwaittime", PLAYERWAIT_TIME);
             Call("setdvar", "scr_game_matchstarttime", MATCHSTART_TIME);
 
+            setTeamName();
+
+            Call("setdvar", "scr_player_respawndelay", "2.5f");
+            Call("setdvar", "scr_game_allowkillcam", "0");
+            Call("setdvar", "scr_infect_timelimit", INFECTED_TIMELIMIT);//Call("setdvar", "scr_player_maxhealth", "");Call("setdvar","scr_player_healthregentime","");
+            Call("setdvar", "g_gametype", GAMETYPE);
+
+            Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
+
         }
-        void readMap()
+        void writrMAP()
         {
-            string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
-
-            MAP_NAME = Call<string>("getdvar", "mapname");
-            var map_list = ENTIRE_MAPLIST.Split('|').ToList();
-            int index = map_list.IndexOf(MAP_NAME);
-            if (index == 35) index = 0;
-
-            NEXT_MAP = map_list[index + 1];
-            Call("setdvar", "sv_nextmap", NEXT_MAP);
-
             string content = NEXT_MAP + ",bot_infected,1";
             File.WriteAllText(@"admin\default.dspl", content);
 

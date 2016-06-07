@@ -26,6 +26,7 @@ namespace Infected
             var texts = text.ToLower().Split(' ');
             var length = texts.Length;
             bool survivor = isSurvivor(player);
+
             if (length == 1)
             {
                 #region Public Say
@@ -86,10 +87,10 @@ namespace Infected
             }else if (length == 2)
             {
                 if (!survivor) return;
-
-                var value = texts[1][0];
-                if (!numChar.Contains(value)) return;
+                var tx = texts[1];if (tx.Length != 1) return;
+                var value = tx[0];if (!numChar.Contains(value)) return;
                 int i = int.Parse(value.ToString());
+
                 switch (texts[0])
                 {
                     case "ap": giveWeaponTo(player, AP(i)); return;

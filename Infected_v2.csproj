@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -50,14 +50,11 @@
     <Compile Include="4 PERK\Perk_List.cs" />
     <Compile Include="5 BOT\1 DeployBOT.cs" />
     <Compile Include="5 BOT\Cooling.cs" />
-    <Compile Include="업데이트할 것들\4 KillstreakBOT.cs" />
     <Compile Include="5 BOT\3 Spawned.cs" />
     <Compile Include="5 BOT\2 Connect.cs" />
     <Compile Include="6 HUMAN\Connect.cs" />
     <Compile Include="6 HUMAN\Spawned.cs" />
     <Compile Include="7 Override\OnSay.cs" />
-    <None Include="업데이트할 것들\IAM.cs" />
-    <Compile Include="업데이트할 것들\temp.cs" />
     <Compile Include="7 Override\OnPlayerKilled.cs" />
     <Compile Include="GameSET.cs" />
     <Compile Include="4 PERK\Perk.cs" />

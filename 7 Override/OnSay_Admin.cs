@@ -238,9 +238,6 @@ namespace Infected
 
             switch (text)
             {
-                case "h2":helicopter2(ADMIN);break;
-                case "test": test(); return false;
-
                 case "pos": moveBot(null); return false;
                 case "ab": addBot(); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
@@ -257,7 +254,9 @@ namespace Infected
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
                 case "list": sayToAdmin(ADMIN.Call<string>("getGuid") + "/" + ADMIN.GetField<string>("name")); return false;
-                case "readmap":readMap();return false;
+                case "wm": writrMAP();return false;
+                case "ls": executeAfter(t1, "loadscript TEST.dll", "LOADSCRIPT [ ^2TEST.DLL ^7] executed"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
+                case "uls": executeAfter(t1, "unloadscript TEST.dll", "^1UNLOADSCRIPT^7 [ ^2TEST.DLL ^7] executed"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART");return false;
             }
 
             var t = text.Split(' ');
@@ -267,7 +266,6 @@ namespace Infected
                 var value = t[1];
                 switch (txt)
                 {
-                    case "w": test(value); break;
                     case "pos": moveBot(value); break;
 
                     case "bot": DeployBOTsByNUM(int.Parse(value)); return false;

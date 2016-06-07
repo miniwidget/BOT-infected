@@ -26,6 +26,10 @@ namespace Infected
                 }
                 return this.ar;
             }
+            set
+            {
+                this.ar = value;
+            }
         }
 
         int lm = 0;
@@ -38,6 +42,9 @@ namespace Infected
                 this.lm++;
                 if (this.lm > 2) this.lm = 0;
                 return this.lm;
+            }set
+            {
+                this.lm = 0;
             }
         }
 

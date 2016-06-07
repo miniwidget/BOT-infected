@@ -38,7 +38,6 @@ namespace Infected
             "^7TYPE ^2[ ^7FOLLOWING ^2] ^7TO GET WEAPONS",
             "^2[ ^7RIOT ^2] TO GET RIOTSHIELD",
             "^2[ ^7STINGER ^2] TO GET STINGER",
-
         };
 
         void ShowInfoA(Entity ent)

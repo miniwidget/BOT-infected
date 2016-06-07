@@ -10,32 +10,48 @@ namespace Infected
 {
     public partial class Infected
     {
-        void human_spawned(Entity player)
+        void human_spawned(Entity player)//LIFE 1 or 2
         {
             var LIFE = player.GetField<int>("LIFE");
 
-            if (LIFE == 0)//LIFE 1 more time
+            if (LIFE == 1||LIFE==2)//LIFE 1 more time
             {
-                player.SetField("LIFE", 1);
-               
+                if (LIFE == 1)
+                {
+                    player.SetField("LIFE", 0);
+                    player.Call("iPrintlnBold", "^2[ ^71 LIFE ^2] MORE");
+                }
+                else
+                {
+                    player.SetField("LIFE", 3);
+                    player.Call("iPrintlnBold", "^2[ ^72 LIFE ^2] MORE");
+                }
+
                 player.Call("playlocalsound", "mp_last_stand");
                 player.SetField("sessionteam", "allies");
                 player.Notify("menuresponse", "team_marinesopfor", "allies");
                 player.Call("closePopupMenu");
                 setTeamName();
-                player.Call("iPrintlnBold", "^2[ ^71 LIFE ^2] MORE");
+                
             }
-            else if (LIFE == 1)//Imediatley After Change Team, give a new random weapon
+            else if (LIFE == 0||LIFE==3)//Imediatley After Change Team, give a new random weapon
             {
                 player.AfterDelay(100, x =>
                 {
                     giveWeaponTo(player, getRandomWeapon());
-                    player.SetField("LIFE", 2);
+                    if (LIFE == 0)
+                    {
+                        player.SetField("LIFE", -1);
+                    }
+                    else
+                    {
+                        player.SetField("LIFE", 1);
+                    }
                 });
             }
-            else if (LIFE == 2)//change to AXIS
+            else if (LIFE == -1)//change to AXIS
             {
-                player.SetField("LIFE",3);
+                player.SetField("LIFE",-2);
                 player.SetField("sessionteam", "axis");
                 human_List.Remove(player);
                 player.SetField("AX_WEP", 1);
@@ -126,17 +142,17 @@ namespace Infected
             }
             else if (aw == 6)
             {
-                deadManWeapon = SNIPE_LIST[1];
+                deadManWeapon = SN_LIST[1];
                 bullet = 1;
             }
             else if (aw == 7)
             {
-                deadManWeapon = SNIPE_LIST[4];
+                deadManWeapon = SN_LIST[4];
                 bullet = 1;
             }
             else if (aw == 8)
             {
-                deadManWeapon = SNIPE_LIST[5];
+                deadManWeapon = SN_LIST[5];
                 bullet = 1;
             }
             else if (aw == 9)
@@ -146,7 +162,7 @@ namespace Infected
             }
             else if (aw == 10)
             {
-                deadManWeapon = LMG_LIST[2];//10
+                deadManWeapon = LM_LIST[2];//10
                 bullet = 6;
             }
             else

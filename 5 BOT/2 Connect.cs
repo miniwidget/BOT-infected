@@ -69,6 +69,7 @@ namespace Infected
                     {
                         if (player.GetField<string>("sessionteam") == "axis")//감염 시작
                         {
+
                             var name = player.Name;
                             if (name.StartsWith("bot"))//봇이 감염된 경우
                             {
@@ -88,6 +89,27 @@ namespace Infected
                                 BotSuicideAll(player);//사람이 감염된 경우
                             }
 
+                            if (SUICIDE_BOT_) //확인사살
+
+                                AfterDelay(10000, () =>
+                                {
+                                    if (HUMAN_CONNECTED_)
+                                    {
+                                        int num = 0;
+                                        foreach (Entity bot in BOTs_List)
+                                        {
+                                            if (!isSurvivor(bot)) num++;
+                                        }
+                                        if (num < 8)
+                                        {
+                                            foreach (Entity bot in BOTs_List)
+                                            {
+                                                bot.Call("suicide");
+                                            }
+                                            print("■ BOTs SUICIDE ALL executed");
+                                        }
+                                    }
+                                });
                             return false;
                         }
 
@@ -106,9 +128,9 @@ namespace Infected
         /// </summary>
         void BotSuicideExceptFirst()
         {
-            print("■ BotSuicideExceptFirst. HUMAN : " + human_List.Count+ "\n■ Inf : " + first_Inf_BOT.Name);
+            print("■ BotSuicideExceptFirst. HUMAN : " + human_List.Count + "\n■ Inf : " + first_Inf_BOT.Name);
 
-            var max = BOTs_List.Count-1;
+            var max = BOTs_List.Count - 1;
             int i = 0;
             int fidx = BOTs_List.IndexOf(first_Inf_BOT);
 
@@ -116,13 +138,13 @@ namespace Infected
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx,true);
+                    changeBotClass(first_Inf_BOT, fidx, true);
                     return false;
                 }
 
                 if (i != fidx)
                 {
-                    changeBotClass(BOTs_List[i], i,false);
+                    changeBotClass(BOTs_List[i], i, false);
                 }
 
                 i++;
@@ -135,7 +157,7 @@ namespace Infected
         /// </summary>
         void BotSuicideExceptFinal()
         {
-            var max = BOTs_List.Count-1;
+            var max = BOTs_List.Count - 1;
 
             int fidx = BOTs_List.IndexOf(first_Inf_BOT);
 
@@ -150,13 +172,13 @@ namespace Infected
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx,true);
+                    changeBotClass(first_Inf_BOT, fidx, true);
                     foreach (Entity bot in BOTs_List)
                     {
-                        if (isSurvivor(bot))surv++;
+                        if (isSurvivor(bot)) surv++;
                         else axis++;
                     }
-                    print("■ NO HUMAN.\n■ BOTs : " + (max + 1) + " AXIS: " + axis + " ALLIES: " + surv );
+                    print("■ NO HUMAN.\n■ BOTs : " + (max + 1) + " AXIS: " + axis + " ALLIES: " + surv);
                     return false;
                 }
                 if (i == fidx || i == lastidx)
@@ -182,9 +204,9 @@ namespace Infected
         /// </summary>
         void BotSuicideAll(Entity player)
         {
-            print("■ BotSuicideAll. BOTs: "+ BOTs_List.Count +" HUMAN : " + human_List.Count + "\n■ Inf : " + player.Name);
+            print("■ BotSuicideAll. BOTs: " + BOTs_List.Count + " HUMAN : " + human_List.Count + "\n■ Inf : " + player.Name);
 
-            var max = BOTs_List.Count-1;
+            var max = BOTs_List.Count - 1;
             int i = 0;
             OnInterval(250, () =>
             {
@@ -197,13 +219,13 @@ namespace Infected
                     i++;
                     return true;
                 }
-                changeBotClass(BOTs_List[i], i,false);
+                changeBotClass(BOTs_List[i], i, false);
                 i++;
                 return true;
             });
         }
 
-        void changeBotClass(Entity bot, int i,bool change)
+        void changeBotClass(Entity bot, int i, bool change)
         {
 
             if (i == 1 || i == 2)//1=RPG BOT 2=RIOT
