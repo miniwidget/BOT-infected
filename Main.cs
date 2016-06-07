@@ -112,7 +112,7 @@ namespace Infected
                 });
             });
         }
-        //
+        
         //public override void OnExitLevel()
         //{
             //Utilities.ExecuteCommand("map " + NEXT_MAP);
