@@ -3,7 +3,7 @@
 // Server.cfg-configurable settings
 
 // log files
-seta g_log "_fake_mp.log"
+seta g_log "Z:\games_mp.log"
 
 // Server host name. This should always be set by the server admin.
 seta sv_hostname "^2BOT ^7server"
@@ -19,7 +19,7 @@ set scr_game_spectatetype "2"		// by request?
 seta sv_maxclients 18
 
 // Server password. If set, users will be prompted on join attempt.
-seta g_password "0"
+seta g_password ""
 
 // Remote console password. If set, users will have access to a remote console, allowing server administration from a connected client.
 seta rcon_password ""

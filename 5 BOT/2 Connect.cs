@@ -11,13 +11,25 @@ namespace Infected
 {
     public partial class Infected
     {
-        #region Bot_Connected
+        class B_SET
+        {
+            public Entity target { get; set; }
+            public int death {get;set;}
+            public bool fire { get; set; }
+            public bool search { get; set; }
+            public bool temp_fire { get; set; }
+        }
+        List<B_SET> B_FIELD = new List<B_SET>();
+        Dictionary<int, int> BOT_ID = new Dictionary<int, int>();
         string[] BOTs_CLASS = { "axis_recipe1", "axis_recipe2", "axis_recipe3", "class0", "class1", "class2", "class4", "class5", "class6", "class6" };
+
+        #region Bot_Connected
         private void Bot_Connected(Entity bot)
         {
+
             var i = BOTs_List.Count;
 
-            if (i >= 10)
+            if (i > BOT_SETTING_NUM)
             {
                 OVERFLOW_BOT_ = true;
                 Call("kick", bot.EntRef);
@@ -31,89 +43,70 @@ namespace Infected
 
             bot.Notify("menuresponse", "changeclass", BOTs_CLASS[i]);
 
-            //IMPORTANT
-            bot.SetField("bid", i);
-            bot.SetField("tNum", -1);
-
+            B_FIELD.Add(new B_SET());
+            BOT_ID.Add(bot.EntRef, i);
             BOTs_List.Add(bot);
 
-            if (i == 1) waitOnFirstInfected();
+            if (i == BOT_SETTING_NUM - 1) waitOnFirstInfected();
         }
         #endregion
 
 
         void waitOnFirstInfected()
         {
-            print("■ waitOnFirstInfected");
+            //print("■ waitOnFirstInfected");
 
+            string message = "If 1 user is on game and got infected, ^2RESTART  in 5 seconds";
             int failCount = 0;
             OnInterval(t2, () =>
             {
-                if (failCount == 6)
+                if (failCount == 6)//in case, if over 12 sec, in a state that no one got infected. ※ Infected time is 8 sec.
                 {
-                    if (human_List.Count != 0 && BOTs_List.Count != 0)
+                    First_Infed_Player = BOTs_List[0];
+
+                    if (HUMAN_CONNECTED_)//사람이 감염된 경우
                     {
-                        foreach (Entity bot in BOTs_List) bot.Call("suicide");
+                        if (human_List.Count == 1)
+
+                            deplayBOTs_map_init(false, message, 5);
+                        else
+                            BotToAxisExceptLast();
                     }
                     else
                     {
-                        print("■ ■ ■ ■ waitOnFirstInfected - FAIL : return false");
-                        deplayBOTs_map_init(true, "SOMETHING WRONG HAPPEND.RESTART MAP in 5 seconds", 5);
+                        BotToAxisExceptOne();
                     }
+
+                    Server_Hud();
+
                     return false;
                 }
-                for (int i = 0; i < 17; i++)
+
+                foreach (Entity player in Players)
                 {
-                    Entity player = Call<Entity>("getentbynum", i);
-                    if (player != null && player.IsPlayer)
+                    if (player == null || !player.IsPlayer) continue;
+                    if (player.GetField<string>("sessionteam") == "axis")//감염 시작
                     {
-                        if (player.GetField<string>("sessionteam") == "axis")//감염 시작
+                        First_Infed_Player = player;
+
+                        if (player.Name.StartsWith("bot"))//봇이 감염된 경우
                         {
+                            BotToAxisExceptOne();
+                        }
+                        else//사람이 감염된 경우
+                        {
+                            if (human_List.Count == 1)
 
-                            var name = player.Name;
-                            if (name.StartsWith("bot"))//봇이 감염된 경우
-                            {
-                                first_Inf_BOT = player;
-
-                                if (HUMAN_CONNECTED_)//사람이 접속한 경우
-                                {
-                                    BotSuicideExceptFirst();
-                                }
-                                else//사람이 아무도 없는 경우
-                                {
-                                    BotSuicideExceptFinal();
-                                }
-                            }
+                                deplayBOTs_map_init(false, message, 5);
                             else
-                            {
-                                BotSuicideAll(player);//사람이 감염된 경우
-                            }
-
-                            if (SUICIDE_BOT_) //확인사살
-
-                                AfterDelay(10000, () =>
-                                {
-                                    if (HUMAN_CONNECTED_)
-                                    {
-                                        int num = 0;
-                                        foreach (Entity bot in BOTs_List)
-                                        {
-                                            if (!isSurvivor(bot)) num++;
-                                        }
-                                        if (num < 8)
-                                        {
-                                            foreach (Entity bot in BOTs_List)
-                                            {
-                                                bot.Call("suicide");
-                                            }
-                                            print("■ BOTs SUICIDE ALL executed");
-                                        }
-                                    }
-                                });
-                            return false;
+                                BotToAxisExceptLast();
                         }
 
+                        Server_Hud();
+
+                        return false;
                     }
+
                 }
 
                 failCount++;
@@ -122,27 +115,27 @@ namespace Infected
 
         }
 
-
         /// <summary>
         /// 봇이 처음 감염된 경우
         /// </summary>
-        void BotSuicideExceptFirst()
+        void BotToAxisExceptOne()
         {
-            print("■ BotSuicideExceptFirst. HUMAN : " + human_List.Count + "\n■ Inf : " + first_Inf_BOT.Name);
 
             var max = BOTs_List.Count - 1;
             int i = 0;
-            int fidx = BOTs_List.IndexOf(first_Inf_BOT);
+            int fidx = BOTs_List.IndexOf(First_Infed_Player);
+            int bot_ally = max;
+
+            if (fidx == max) bot_ally -= 1;
 
             OnInterval(250, () =>
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx, true);
-                    return false;
+                    changeBotClass(First_Infed_Player, fidx, true);
+                    return getTeamState();
                 }
-
-                if (i != fidx)
+                if (i!= bot_ally)
                 {
                     changeBotClass(BOTs_List[i], i, false);
                 }
@@ -153,77 +146,31 @@ namespace Infected
         }
 
         /// <summary>
-        /// 봇이 처음 감염된 경우 + 사람이 아무도 접속하지 않은 경우 = 대기상태를 만들기 위해 봇 2 마리를 살려 놓음
+        /// 사람이 처음으로 감염된 경우
         /// </summary>
-        void BotSuicideExceptFinal()
+        void BotToAxisExceptLast()
         {
             var max = BOTs_List.Count - 1;
 
-            int fidx = BOTs_List.IndexOf(first_Inf_BOT);
-
-            int lastidx = 0;
-            if (fidx == 0) lastidx = 1; else lastidx = fidx - 1;
-
-            int axis = 0, surv = 0;
-
             int i = 0;
-
             OnInterval(250, () =>
             {
                 if (i == max)
                 {
-                    changeBotClass(first_Inf_BOT, fidx, true);
-                    foreach (Entity bot in BOTs_List)
-                    {
-                        if (isSurvivor(bot)) surv++;
-                        else axis++;
-                    }
-                    print("■ NO HUMAN.\n■ BOTs : " + (max + 1) + " AXIS: " + axis + " ALLIES: " + surv);
-                    return false;
-                }
-                if (i == fidx || i == lastidx)
-                {
-                    //if (TEST_)
-                    //{
-                    //    if(i == fidx) print(BOTs_List[i].Name + "//FIRST_inf:" + i);
-                    //    else print(BOTs_List[i].Name + "//LAST_inf:" + i);
-                    //}
-                    if (i != max) i++;
-                    return true;// 살려 놓은 봇 , 첫 감염자 봇
+                    return getTeamState();
                 }
 
                 changeBotClass(BOTs_List[i], i, false);
-                //if (TEST_) print(BOTs_List[i].Name + "//" + i);
                 i++;
                 return true;
             });
         }
+
 
         /// <summary>
-        /// 봇 다 죽임. 사람이 처음으로 감염된 경우
+        /// 봇이 처음 감염된 경우 & 사람이 아무도 접속하지 않은 경우 = 대기상태를 만들기 위해 봇 1 마리를 살려 놓음
         /// </summary>
-        void BotSuicideAll(Entity player)
-        {
-            print("■ BotSuicideAll. BOTs: " + BOTs_List.Count + " HUMAN : " + human_List.Count + "\n■ Inf : " + player.Name);
 
-            var max = BOTs_List.Count - 1;
-            int i = 0;
-            OnInterval(250, () =>
-            {
-                if (i == max)
-                {
-                    return false;
-                }
-                if (i == 0)
-                {
-                    i++;
-                    return true;
-                }
-                changeBotClass(BOTs_List[i], i, false);
-                i++;
-                return true;
-            });
-        }
 
         void changeBotClass(Entity bot, int i, bool change)
         {
@@ -243,6 +190,18 @@ namespace Infected
 
             bot.Call("suicide");
             if (change) setTeamName();
+        }
+
+        bool getTeamState()
+        {
+            int alive = 0, max = BOTs_List.Count;
+            foreach (Entity bot in BOTs_List)
+            {
+                if (isSurvivor(bot)) alive++;
+            }
+            print("■ BOTs: " + max + " AXIS: " + (max - alive) + " ALLIES: " + alive + " Inf : " + First_Infed_Player.Name);
+            print("■ HUMANs: " +human_List.Count);
+            return false;
         }
 
     }

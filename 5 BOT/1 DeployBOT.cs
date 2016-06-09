@@ -11,42 +11,60 @@ namespace Infected
 {
     public partial class Infected
     {
-        private List<Entity> human_List = new List<Entity>();
-        List<Entity> BOTs_List = new List<Entity>();
-        private bool[] bot_search = new bool[10];
-        private bool[] bot_fire = new bool[10];
-        private bool isSurvivor(Entity player) { return player.GetField<string>("sessionteam") == "allies"; }
-        Entity first_Inf_BOT;
 
-        #region 게임 시작 후, 봇 불러오기 //실패 시, 맵 다시 시작
+        #region 게임 시작 후, 봇 불러오기 
+
         void deplayBOTs()
         {
-            if (BOTs_List.Count >= 10) return;
+            if (Players.Count > 0)//when fast_restart executed, remove pre allocated bots in Infinityscript
+            {
+                foreach (Entity p in Players)
+                {
+                    if (p.Name == "") BOTs_List.Add(p);
+                }
+                foreach (Entity p in BOTs_List)
+                {
+                    Players.Remove(p);
+                }
+                BOTs_List.Clear();
+            }
 
-            int fail_count=0;
+            int fail_count=0 , max = BOT_SETTING_NUM - 1;
             OnInterval(250, () =>
             {
-                if (OVERFLOW_BOT_) return false;
-                if (BOTs_List.Count > 10) return false;
+                if (BOTs_List.Count > max || OVERFLOW_BOT_) return false;
                 if (fail_count > 5)
                 {
                     deplayBOTs_map_init(true, "SOMETHING WRONG HAPPEND.RESTART MAP in 5 seconds",5);
                     return false;
                 }
+
                 Entity b = Utilities.AddTestClient();
 
                 if (b == null)
                 {
                     fail_count++;
-                    return true;
                 }
+                
                 return true;
 
             });
         }
-        void deplayBOTs_map_init(bool wrong,string message,int sec)//
+        void deplayBOTs_map_init(bool wrong,string message,int sec)
         {
             if(wrong) KickBOTsAll();
+
+            int speed = 25;
+            int decayStart = 3000;
+            int decayDuration = 1000;
+
+            HudElem END = HudElem.CreateServerFontString("default", 2f);
+            END.SetPoint("CENTER", "CENTER", 0, 100);
+            END.Foreground = true;
+            END.HideWhenInMenu = false;
+            END.Alpha = 1f;
+            END.Call("setpulsefx", speed, decayStart, decayDuration);
+            END.SetText(message);
 
             HudElem staticBG = HudElem.NewHudElem();
             staticBG.HorzAlign = "fullscreen";
@@ -55,20 +73,9 @@ namespace Infected
             staticBG.Foreground = true;
             staticBG.HideWhenInMenu = false;
             staticBG.Alpha = 0;
-            staticBG.Call("fadeovertime", 2f);
+            staticBG.Call("fadeovertime", 1.5f);
             staticBG.Alpha = 1f;
 
-            int transitiontime = 100;
-            int duration = 5000;
-            int decayduration = 1000;
-
-            HudElem END = HudElem.CreateServerFontString("default", 2f);
-            END.SetPoint("CENTER", "CENTER", 0, 100);
-            END.Foreground = true;
-            END.HideWhenInMenu = false;
-            END.Alpha = 1f;
-            END.Call("setpulsefx", transitiontime, duration, decayduration);
-            END.SetText(message);
 
             AfterDelay(sec*1000, () => Utilities.ExecuteCommand("fast_restart"));
         }

@@ -11,21 +11,10 @@ namespace Infected
     public partial class Infected
     {
 
-        void Inf_PlayerConnected(Entity player)
+        void Human_Connected(Entity player)
         {
 
             string name = player.Name;
-           
-            if (name.StartsWith("bot") )
-            {
-                int i = 0;
-                bool isEndwithNum = int.TryParse(name[name.Length - 1].ToString(), out i);
-                if (isEndwithNum)
-                {
-                    Bot_Connected(player);
-                    return;
-                }
-            }
 
             if (player.Name == ADMIN_NAME)
             {
@@ -38,7 +27,8 @@ namespace Infected
                 }
             }
 
-            if (human_List.Count > 7)
+            var max = 18 - ( BOT_SETTING_NUM +1);
+            if (human_List.Count > max)
             {
                 Utilities.ExecuteCommand("dropclient " + player.EntRef + "SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]");
                 return;
@@ -47,12 +37,12 @@ namespace Infected
             if (isSurvivor(player))
             {
                 if (!HUMAN_CONNECTED_) HUMAN_CONNECTED_ = true;
-                print(name + " connected ♥");
+                print(name + " connected ♥" );
                 Client_init_GAME_SET(player);
             }
             else
             {
-                Utilities.ExecuteCommand("dropclient " + player.EntRef + "Enter the Server Next Round");
+                Utilities.ExecuteCommand("dropclient " + player.EntRef + " See you Next Round");
             }
 
         }
@@ -61,6 +51,7 @@ namespace Infected
             if (human_List.Contains(player))// 봇 타겟리스트에서 접속 끊은 사람 제거
             {
                 human_List.Remove(player);
+                
             }
             if (human_List.Count == 0 && !GAME_ENDED_) HUMAN_CONNECTED_ = false;
         }

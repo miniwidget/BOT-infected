@@ -10,17 +10,31 @@ namespace Infected
 {
     public partial class Infected : BaseScript
     {
+        bool TEST_ = true;
 
         public Infected()
         {
+
             #region 세팅 불러오기
-            string setFile = "admin\\Infected_SET.txt";
+
+            string setFile = null;
+            if (TEST_)
+            {
+                setFile = "admin\\test\\test_Infected_SET.txt";
+
+            }
+            else
+            {
+                setFile = "admin\\Infected_SET.txt";
+            }
+
+            int i;
+
             if (File.Exists(setFile))
             {
                 using (StreamReader set = new StreamReader(setFile))
                 {
                     bool b;
-                    int i;
                     float f;
 
                     while (!set.EndOfStream)
@@ -50,8 +64,9 @@ namespace Infected
                             case "SEARCH_TIME": if (int.TryParse(value, out i)) SEARCH_TIME = i; break;
                             case "FIRE_TIME": if (int.TryParse(value, out i)) FIRE_TIME = i; break;
                             case "BOT_DELAY_TIME": if (int.TryParse(value, out i)) BOT_DELAY_TIME = i; break;
+                            case "BOT_SETTING_NUM": if (int.TryParse(value, out i)) BOT_SETTING_NUM = i; break;
 
-                            case "TEST_": if (bool.TryParse(value, out b)) TEST_ = b; break;
+                            case "TEST_": if (!TEST_ && bool.TryParse(value, out b)) TEST_ = b; break;
                             case "DEPLAY_BOT_": if (bool.TryParse(value, out b)) DEPLAY_BOT_ = b; break;
                             case "USE_ADMIN_SAFE_": if (bool.TryParse(value, out b)) USE_ADMIN_SAFE_ = b; break;
                             case "SUICIDE_BOT_": if (bool.TryParse(value, out b)) SUICIDE_BOT_ = b; break;
@@ -62,62 +77,51 @@ namespace Infected
                     if (TEST_) SERVER_NAME = "^2BOT ^7TEST";
                 }
             }
-            #endregion
 
             Server_SetDvar();
 
-            PlayerConnecting += (player) =>
+            #endregion
+
+            PlayerConnecting += player =>
             {
-                if (PREMATCH_DONE) return;
-                string name = player.Name;
-                if (name.StartsWith("bot"))
+                if (PREMATCH_DONE) return;//when game map_rotate, remove all bot
+                if (player.Name.StartsWith("bot"))
                 {
                     Call("kick", player.EntRef);
-                    //if (TEST_) print(name + "KICKED★");
                 }
             };
-            PlayerConnected += (player) =>
-            {
-                string name = player.Name;
 
-                if (name.StartsWith("bot"))
+            PlayerConnected += player =>
+            {
+                if (player.Name.StartsWith("bot"))
                 {
-                    if (!PREMATCH_DONE)
+                    if (!PREMATCH_DONE)//when fast_restart executed, remove bot
                     {
                         Call("kick", player.EntRef);
-                        //if (TEST_) print("BOT" + player.EntRef + " kicked before PMCH");
                         return;
                     }
                     Bot_Connected(player);
                 }
-
-                else Inf_PlayerConnected(player);
+                else
+                {
+                    Human_Connected(player);
+                }
             };
-
-            PlayerDisconnected += Inf_PlayerDisConnected;
 
             OnNotify("prematch_done", () =>
             {
                 PREMATCH_DONE = true;
-                Server_Hud();
                 if (DEPLAY_BOT_) deplayBOTs();
-            });
 
-            OnNotify("game_ended", (level) =>
-            {
-                GAME_ENDED_ = true;
-                AfterDelay(20000, () =>
+                PlayerDisconnected += Inf_PlayerDisConnected;
+
+                OnNotify("game_ended", (level) =>
                 {
-                    Utilities.ExecuteCommand("map_rotate");
+                    GAME_ENDED_ = true;
+                    AfterDelay(20000, () => Utilities.ExecuteCommand("map_rotate"));
                 });
             });
         }
-        
-        //public override void OnExitLevel()
-        //{
-            //Utilities.ExecuteCommand("map " + NEXT_MAP);
-        //}
-
     }
 }
 

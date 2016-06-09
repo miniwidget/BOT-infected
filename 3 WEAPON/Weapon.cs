@@ -67,14 +67,14 @@ namespace Infected
         string[] AR_ATTACHMENT = new[] { "_silencer", "_heartbeat", "" };
         string[] AP_ATTACHMENT = new[] { "_silencer02", "" };
         string[] SN_ATTACHMENT = new[] { "_silencer03", "_heartbeat", "" };
-        string[] AR_VIEWER = {  "_thermal", "_reflex", "_eotech", "" };
+        string[] AR_VIEWER = { "_acog", "_thermal", "_reflex", "_eotech", "" };
 
         string[] G_AR = { "ak47", "m16", "m4", "fad", "acr", "type95", "mk14", "scar", "g36c", "cm901" };
         string[] G_LM = { "m60", "mk46", "pecheneg", "sa80", "mg36" };
         string[] G_SN = { "dragunov", "msr", "barrett", "rsass", "as50", "l96a1", };
 
         List<string> ATT_Lists = new List<string>() { "_rof", "_acog", "_thermal", "_reflex", "_eotech" };
-        List<Attach> ATT_List = new List<Attach>();
+        List<H_SET> H_FIELD = new List<H_SET>();
         //string[] G_PISTOL = { "fmg9", "skorpion", "mp9", "g18" };
         //string[] G_GUN = { "mp412", "p99", "44magnum", "usp45", "fnfiveseven", "deserteagle" };
         //string[] G_SM = { "mp5", "m9", "p90", "pp90m1", "ump45", "mp7", };
@@ -151,7 +151,6 @@ namespace Infected
                     showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON");
                     return;
                 }
-                Attach att = ATT_List[human_List.IndexOf(player)];
 
                 string NEW_WEAP = null;
                 int insertIdx = CW.IndexOf("mp") + 2;
@@ -174,7 +173,7 @@ namespace Infected
                         }
 
                         NEW_WEAP = CW.Replace(s, ATT_Lists[idx]);
-                        print(NEW_WEAP);
+                        //print(NEW_WEAP);
                         found = true;
                         break;
                     }
@@ -195,7 +194,7 @@ namespace Infected
         #endregion
 
         #region attachment hertbeat
-        void giveAttachHeartbeat(Entity player)
+        void giveAttachHeartbeat(Entity player,int num)
         {
             try
             {
@@ -207,7 +206,7 @@ namespace Infected
 
                 if (type == "ar" || type == "lm" || type == "sn")
                 {
-                    Attach att = ATT_List[human_List.IndexOf(player)];
+                    H_SET att = H_FIELD[num];
                     int i = att.SIRENCERorHB;
 
                     string hb = "_heartbeat";

@@ -15,6 +15,8 @@ namespace Infected
             for (int i = 17; i > 0; i--)
             {
                 Entity ent = Entity.GetEntity(i);
+                
+                if (ent == null) continue;
                 if (ent.Call<string>("getguid").Contains("bot"))
                 {
                     Call("kick", i);
@@ -253,10 +255,9 @@ namespace Infected
                 case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
-                case "list": sayToAdmin(ADMIN.Call<string>("getGuid") + "/" + ADMIN.GetField<string>("name")); return false;
                 case "wm": writrMAP();return false;
-                case "ls": executeAfter(t1, "loadscript TEST.dll", "LOADSCRIPT [ ^2TEST.DLL ^7] executed"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
-                case "uls": executeAfter(t1, "unloadscript TEST.dll", "^1UNLOADSCRIPT^7 [ ^2TEST.DLL ^7] executed"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART");return false;
+                case "lts": executeAfter(t1, "loadscript test\\TEST.dll", "^2Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
+                case "ults": executeAfter(t1, "unloadscript test\\TEST.dll", "^1Un Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART");return false;
             }
 
             var t = text.Split(' ');

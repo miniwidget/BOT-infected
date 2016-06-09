@@ -12,40 +12,41 @@ namespace Infected
 
         void Server_Hud()
         {
-            HudElem staticBG = HudElem.NewHudElem();
-            staticBG.HorzAlign = "fullscreen";
-            staticBG.VertAlign = "fullscreen";
-            staticBG.SetShader("black", 640, 480);
-            staticBG.Foreground = true;
-            staticBG.HideWhenInMenu = false;
-            staticBG.Alpha = 0.7f;
-            staticBG.Call("fadeovertime", 5f);
-            staticBG.Alpha = 0f;
+            //HudElem staticBG = HudElem.NewHudElem();
+            //staticBG.HorzAlign = "fullscreen";
+            //staticBG.VertAlign = "fullscreen";
+            //staticBG.SetShader("black", 640, 480);
+            //staticBG.Foreground = true;
+            //staticBG.HideWhenInMenu = false;
+            //staticBG.Alpha = 0.7f;
+            //staticBG.Call("fadeovertime", 5f);
+            //staticBG.Alpha = 0f;
 
-            HudElem START = HudElem.CreateServerFontString("objective", 1.8f);
-            START.SetPoint("CENTER", "CENTER", 0, 100);
-            START.Foreground = true;
-            START.HideWhenInMenu = false;
-            START.Alpha = 0.8f;
-            START.SetField("glowcolor", new Vector3(0.8f, 1f, 0.8f));
-            START.GlowAlpha = 0.2f;
-            START.Call("setpulsefx", 100, 4000, 2000);
-            START.SetText(SERVER_NAME);
-            AfterDelay(t3 * 2, () => { staticBG.Call("destroy"); START.Call("destroy"); });
+            //HudElem START = HudElem.CreateServerFontString("objective", 1.8f);
+            //START.SetPoint("CENTER", "CENTER", 0, 100);
+            //START.Foreground = true;
+            //START.HideWhenInMenu = false;
+            //START.Alpha = 0.8f;
+            //START.SetField("glowcolor", new Vector3(0.8f, 1f, 0.8f));
+            //START.GlowAlpha = 0.2f;
+            //START.Call("setpulsefx", 100, 4000, 2000);
+            //START.SetText(SERVER_NAME);
+            //AfterDelay(t3 * 2, () => { staticBG.Call("destroy"); START.Call("destroy"); });
 
             HudElem INFO1 = HudElem.CreateServerFontString("hudbig", 0.8f);
             INFO1.X = 240;
             INFO1.Y = 3;
-            INFO1.Y = -10;
-            INFO1.Alpha = 0f;
+            //INFO1.Y = -10;
+            INFO1.Alpha = 0.7f;
             INFO1.HideWhenInMenu = true;
             INFO1.SetText(SERVER_NAME);
-            AfterDelay(t1 * 15, () =>
-            {
-                INFO1.Call("moveovertime", 2);
-                INFO1.Y = 3;
-                INFO1.Alpha = 0.7f;
-            });
+
+            //AfterDelay(t2, () =>
+            //{
+            //    INFO1.Call("moveovertime", 2);
+            //    INFO1.Y = 3;
+            //    INFO1.Alpha = 0.7f;
+            //});
         }
 
         void AlliesHud(Entity player,string offhand)
@@ -84,8 +85,8 @@ namespace Infected
         {
             player.Notify("CLOSE");
             player.Notify("CLOSE_perk");
-            human_List.Remove(player);
-            player.SetField("PERK", 50);
+            //human_List.Remove(player);
+            
 
             HudElem axis_weap_hud = HudElem.CreateFontString(player, "hudbig", 0.5f);
             axis_weap_hud.X = 740;

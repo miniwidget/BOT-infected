@@ -16,17 +16,19 @@ namespace Infected
         //봇 스폰 시작
         private void spawned_bot(Entity bot)
         {
-            int num = bot.GetField<int>("bid");
+            int num = BOT_ID[bot.EntRef];
             if (num == -1)
             {
                 removeBot(bot);
                 return;
             }
 
-            int death = bot.GetField<int>("deaths");
-            bot_search[num] = false;
-            bot_fire[num] = false;
-            bot.SetField("tNum", -1);
+            B_SET B = B_FIELD[num];
+            B.target = null;
+            B.fire = false;
+            B.search = false;
+            B.temp_fire = false;
+            B.death += 1;
 
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
@@ -38,56 +40,52 @@ namespace Infected
 
             bot.AfterDelay(BOT_DELAY_TIME, b =>
             {
-                bot_search[num] = true;
-                bot_fire[num] = true;
+                B.fire = true;
+                B.search = true;
 
                 b.Call("show");
                 b.Health = 100;
                 if (num != 0) bot.Call("setmovespeedscale", 1f);
                 else bot.Call("setmovespeedscale", 0.6f);
 
-                start_bot_search(b, num, weapon, death);
+                start_bot_search(b, num, weapon, B);
             });
 
         }
 
         //봇 목표물 찾기 루프
-        private void start_bot_search(Entity bot, int num, string weapon, int death)
+        private void start_bot_search(Entity bot, int num, string weapon, B_SET B)
         {
             bool pause = false;
 
+            int death = B.death;
             bot.OnInterval(SEARCH_TIME, b =>
             {
-                if (GAME_ENDED_ || !bot_search[num]) return false;
-                if (death != bot.GetField<int>("deaths")) return false;
+                if (GAME_ENDED_ || !B.search) return false;
+                if (death != B.death) return false;
 
                 if (!HUMAN_CONNECTED_)
                 {
-                    bot_fire[num] = false;
+                    B.fire = false;
                     return true;
                 }
 
-                var targetNum = bot.GetField<int>("tNum");
+                var target = B.target;
 
-                if (targetNum != -1)//이미 타겟을 찾은 경우
+                if (target != null)//이미 타겟을 찾은 경우
                 {
-
-                    Entity t = Call<Entity>(52, targetNum);//getentbynum
-                    if (t != null)
+                    if (isSurvivor(target))
                     {
-                        if (isSurvivor(t))
+                        var POD = target.Origin.DistanceTo(bot.Origin);
+                        if (POD < 600)//toDo : 멀리서 가격한 경우 추가할 것
                         {
-                            var POD = t.Origin.DistanceTo(bot.Origin);
-                            if (POD < 600)
-                            {
-                                pause = false;
-                                return true;
-                            }
+                            pause = false;
+                            return true;
                         }
                     }
 
-                    bot.SetField("tNum", -1);
-                    bot_fire[num] = false;
+                    B.target = null;
+                    B.fire = false;
                     bot.Call(33468, weapon, 0);//setweaponammoclip
                 }
                 pause = true;
@@ -99,14 +97,14 @@ namespace Infected
 
                     if (POD < 600)
                     {
-                        bot.SetField("tNum", human.EntRef);
-                        bot_fire[num] = true;
+                        B.target = human;
+                        B.fire = true;
                         pause = false;
                         //int i = 0;
                         b.OnInterval(FIRE_TIME, bb =>
                         {
                             if (pause) return false;
-                            if (!bot_fire[num] || GAME_ENDED_ || human == null) return false;
+                            if (!B.fire || GAME_ENDED_ || human == null) return false;
                             //print(bb.Name + bot_fire[num] + i++);
                             var ho = human.Origin; ho.Z -= 50;
 
@@ -139,7 +137,7 @@ namespace Infected
         }
         void spawned_bot_slower(Entity bot)
         {
-            int num = bot.GetField<int>("bid");
+            int num = BOT_ID[bot.EntRef];
             if (num == -1)
             {
                 removeBot(bot);
@@ -151,11 +149,12 @@ namespace Infected
                 bot.Call(33469, "rpg_mp", 0);//setweaponammostock
             }
 
-            int death = bot.GetField<int>("deaths");
-
-            bot_search[num] = false;
-            bot_fire[num] = false;
-            bot.SetField("tNum", -1);
+            B_SET B = B_FIELD[num];
+            B.target = null;
+            B.fire = false;
+            B.search = false;
+            B.temp_fire = false;
+            B.death += 1;
 
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
@@ -163,8 +162,8 @@ namespace Infected
 
             bot.AfterDelay(10000, b =>
             {
-                bot_search[num] = true;
-                bot_fire[num] = true;
+                B.fire = true;
+                B.search = true;
 
                 bot.Health = 100;
                 b.Call("show");
@@ -173,52 +172,47 @@ namespace Infected
                 if (num == 1)
                 {
                     bot.Call("setmovespeedscale", 0.7f);
-                    start_bot_search_slower(b, num, 1500, death);
+                    start_bot_search_slower(b, num, 1500, B);
                 }
                 else
                 {
                     bot.Call("setmovespeedscale", 1.5f);
-                    start_bot_search_slower(b, num, 500, death);
+                    start_bot_search_slower(b, num, 500, B);
                 }
             });
         }
-        private void start_bot_search_slower(Entity bot, int num, int fire_time, int death)
+        private void start_bot_search_slower(Entity bot, int num, int fire_time, B_SET B)
         {
             bool pause = false;
+            int death = B.death;
 
             bot.OnInterval(SEARCH_TIME, b =>
             {
-                if (GAME_ENDED_ || !bot_search[num]) return false;
-                if (death != bot.GetField<int>("deaths")) return false;
+                if (GAME_ENDED_ || !B.search) return false;
+                if (death != B.death) return false;
 
                 if (!HUMAN_CONNECTED_)
                 {
-                    bot_fire[num] = false;
+                    B.fire = false;
                     return true;
                 }
 
-                var targetNum = bot.GetField<int>("tNum");
+                var target = B.target;
 
-                if (targetNum != -1)//이미 타겟을 찾은 경우
+                if (target != null)//이미 타겟을 찾은 경우
                 {
-
-                    Entity t = Call<Entity>(52, targetNum);//getentbynum
-                    if (t != null)
+                    if (isSurvivor(target))
                     {
-                        if (isSurvivor(t))
+                        var POD = target.Origin.DistanceTo(bot.Origin);
+                        if (POD < 600)
                         {
-                            var POD = t.Origin.DistanceTo(bot.Origin);
-                            if (POD < 600)
-                            {
-                                pause = false;
-                                return true;
-                            }
+                            pause = false;
+                            return true;
                         }
                     }
 
-                    //타겟과 거리가 멀어진 경우, 타겟 제거
-                    bot.SetField("tNum", -1);
-                    bot_fire[num] = false;
+                    B.target = null; //타겟과 거리가 멀어진 경우, 타겟 제거
+                    B.fire = false;
                     if (num == 1) bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
                 }
 
@@ -231,15 +225,15 @@ namespace Infected
 
                     if (POD < 600)
                     {
-                        bot.SetField("tNum", human.EntRef);
-                        bot_fire[num] = true;
+                        B.target = human;
+                        B.fire = true;
                         pause = false;
-                        if(num==1) human.Call(33466, "missile_incoming");
+                        if (num == 1) human.Call(33466, "missile_incoming");
 
                         b.OnInterval(fire_time, bb =>
                         {
                             if (pause) return false;
-                            if (!bot_fire[num] || GAME_ENDED_ || human == null) return false;
+                            if (!B.fire || GAME_ENDED_ || human == null) return false;
 
                             var ho = human.Origin; ho.Z -= 50;
 
