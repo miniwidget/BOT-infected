@@ -32,7 +32,7 @@ namespace Infected
             if (B.wep == null) B.wep = bot.CurrentWeapon;
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
-            bot.Health = -1;
+            if(num!=0)bot.Health = -1;
 
             var weapon = B.wep;
             bot.Call(33468, weapon, 0);//setweaponammoclip
@@ -44,9 +44,16 @@ namespace Infected
                 B.search = true;
 
                 b.Call("show");
-                b.Health = 100;
-                if (num != 0) bot.Call("setmovespeedscale", 1f);
-                else bot.Call("setmovespeedscale", 0.6f);
+
+                if (num != 0)//GENERAL
+                {
+                    b.Health = 150;
+                    bot.Call("setmovespeedscale", 1f);
+                }
+                else//JUGG
+                {
+                    bot.Call("setmovespeedscale", 0.6f);
+                }
 
                 start_bot_search(b, num, weapon, B);
             });

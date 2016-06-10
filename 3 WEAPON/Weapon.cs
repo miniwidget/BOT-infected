@@ -37,17 +37,17 @@ namespace Infected
 
         string AP() { return AP_LIST[rnd.Next(WEAPON_INDEX[0])] + AP_ATTACHMENT[rnd.Next(2)]; }
         string AG() { return AG_LIST[rnd.Next(WEAPON_INDEX[1])]; }
-        string AR() { return AR_LIST[rnd.Next(WEAPON_INDEX[2])] + AR_ATTACHMENT[rnd.Next(3)] + AR_VIEWER[rnd.Next(5)] + CAMO_LIST[rnd.Next(11)]; }
+        string AR() { return AR_LIST[rnd.Next(WEAPON_INDEX[2])] + AR_ATTACHMENT[rnd.Next(2)] + AR_VIEWER[rnd.Next(5)] + CAMO_LIST[rnd.Next(11)]; }
         string SM() { return SM_LIST[rnd.Next(WEAPON_INDEX[3])] + CAMO_LIST[rnd.Next(11)]; }
-        string LM() { return LM_LIST[rnd.Next(WEAPON_INDEX[4])] + AR_ATTACHMENT[rnd.Next(3)] + AR_VIEWER[rnd.Next(5)] + CAMO_LIST[rnd.Next(11)]; }
+        string LM() { return LM_LIST[rnd.Next(WEAPON_INDEX[4])] + AR_ATTACHMENT[rnd.Next(2)] + AR_VIEWER[rnd.Next(5)] + CAMO_LIST[rnd.Next(11)]; }
         string SG() { return SG_LIST[rnd.Next(WEAPON_INDEX[5])] + CAMO_LIST[rnd.Next(11)]; }
         string SN() { return SN_LIST[rnd.Next(6)] + SN_ATTACHMENT[rnd.Next(3)] + CAMO_LIST[rnd.Next(11)]; }
 
         string AP(int i) { if (i > WEAPON_INDEX[0]) i = 0; return AP_LIST[i] + AP_ATTACHMENT[rnd.Next(2)]; }
         string AG(int i) { if (i > WEAPON_INDEX[1]) i = 0; return AG_LIST[i]; }
-        string AR(int i) { if (i > WEAPON_INDEX[2]) i = 0; return AR_LIST[i] + AR_ATTACHMENT[rnd.Next(3)] + AR_VIEWER[rnd.Next(1, 6)] + CAMO_LIST[rnd.Next(11)]; }
+        string AR(int i) { if (i > WEAPON_INDEX[2]) i = 0; return AR_LIST[i] + AR_ATTACHMENT[rnd.Next(2)] + AR_VIEWER[rnd.Next(1, 6)] + CAMO_LIST[rnd.Next(11)]; }
         string SM(int i) { if (i > WEAPON_INDEX[3]) i = 0; return SM_LIST[i] + CAMO_LIST[rnd.Next(11)]; }
-        string LM(int i) { if (i > WEAPON_INDEX[4]) i = 0; return LM_LIST[i] + AR_ATTACHMENT[rnd.Next(3)] + AR_VIEWER[rnd.Next(1, 6)] + CAMO_LIST[rnd.Next(11)]; }
+        string LM(int i) { if (i > WEAPON_INDEX[4]) i = 0; return LM_LIST[i] + AR_ATTACHMENT[rnd.Next(2)] + AR_VIEWER[rnd.Next(1, 6)] + CAMO_LIST[rnd.Next(11)]; }
         string SG(int i) { if (i > WEAPON_INDEX[5]) i = 0; return SG_LIST[i] + CAMO_LIST[rnd.Next(11)]; }
         string SN(int i) { if (i > WEAPON_INDEX[6]) i = 0; return SN_LIST[i] + SN_ATTACHMENT[rnd.Next(3)] + CAMO_LIST[rnd.Next(11)]; }
 
@@ -64,7 +64,7 @@ namespace Infected
         string[] LAUNCHER_LIST = new[] { "stinger_mp", "m320_mp", "xm25_mp", "javelin_mp", };
 
         string[] CAMO_LIST = new[] { "_camo01", "_camo02", "_camo03", "_camo04", "_camo05", "_camo06", "_camo07", "_camo08", "_camo09", "_camo10", "_camo11" };
-        string[] AR_ATTACHMENT = new[] { "_silencer", "_heartbeat", "" };
+        string[] AR_ATTACHMENT = new[] { "_silencer",  "" };//"_heartbeat",
         string[] AP_ATTACHMENT = new[] { "_silencer02", "" };
         string[] SN_ATTACHMENT = new[] { "_silencer03", "_heartbeat", "" };
         string[] AR_VIEWER = { "_acog", "_thermal", "_reflex", "_eotech", "" };
@@ -147,7 +147,9 @@ namespace Infected
                 var type = getWeaponType(CW);
                 if (type == null || type == "sn")
                 {
-                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON");
+                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON, but ^2AMMO REFILLD");
+                    player.Call("givemaxammo", CW);
+
                     return;
                 }
 
@@ -228,7 +230,8 @@ namespace Infected
                 }
                 else
                 {
-                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON");
+                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON, but ^2AMMO REFILLD");
+                    player.Call("givemaxammo", CW);
                 }
 
             }

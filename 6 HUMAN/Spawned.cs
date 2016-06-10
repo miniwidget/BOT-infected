@@ -65,7 +65,6 @@ namespace Infected
                 player.AfterDelay(100, x =>
                 {
                     giveWeaponTo(player, getRandomWeapon());
-                    player.Health = 120;
                     if (LIFE == 0)
                     {
                         H.LIFE = -1;

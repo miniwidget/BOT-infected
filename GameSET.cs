@@ -100,18 +100,21 @@ namespace Infected
             int[] largeMap = { 3, 10, 17, 27, 40 };
             if (smallMap.Contains(index))
             {
+                print("■ SMALL MAP");
                 PLAYER_LIFE = 2;
                 FIRE_DIST = 600;
             }
             else if (largeMap.Contains(index))
             {
+                print("■ LARGE MAP");
                 PLAYER_LIFE = 1;
-                FIRE_DIST = 750;
+                FIRE_DIST = 850;
             }
             else
             {
+                print("■ NORMAL MAP");
                 PLAYER_LIFE = 1;
-                FIRE_DIST = 680;
+                FIRE_DIST = 750;
             }
             NEXT_MAP = map_list[index + 1];
             Call("setdvar", "sv_nextmap", NEXT_MAP);

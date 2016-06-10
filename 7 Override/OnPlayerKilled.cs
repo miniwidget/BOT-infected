@@ -52,9 +52,8 @@ namespace Infected
             }
 
             bool isBOT = player.Name.StartsWith("bot");
-            bool isSurv = isSurvivor(attacker);
 
-            if (isBOT && isSurv)
+            if (isBOT && isSurvivor(attacker))
             {
                 if (weapon[2] == '5')
                 {
@@ -68,7 +67,7 @@ namespace Infected
 
                 if (mod == "MOD_MELEE" && Disable_Melee_)
                 {
-                    if (!isBOT && isSurv) player.Health += damage;
+                    if (!isBOT && isSurvivor(player)) player.Health += damage;
                     return;
                 }
                 if (USE_ADMIN_SAFE_)
