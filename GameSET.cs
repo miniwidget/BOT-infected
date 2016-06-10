@@ -11,47 +11,55 @@ namespace Infected
     {
         #region field
         string
-            SERVER_NAME,
-            ADMIN_NAME,
-            TEAMNAME_ALLIES,
-            TEAMNAME_AXIS,
-            //GAMETYPE = "infect",
-            MAP_NAME,
-            WELLCOME_MESSAGE,
-            NEXT_MAP;
+            SERVER_NAME, ADMIN_NAME,
+            TEAMNAME_ALLIES, TEAMNAME_AXIS,
+            MAP_NAME, NEXT_MAP,
+            WELLCOME_MESSAGE;
 
         bool
-            USE_ADMIN_SAFE_,
-            DEPLAY_BOT_,
-            SUICIDE_BOT_,
-            Disable_Melee_,
+            USE_ADMIN_SAFE_,Disable_Melee_,
+            DEPLAY_BOT_, SUICIDE_BOT_, OVERFLOW_BOT_,
 
-            GAME_ENDED_,
-            HUMAN_CONNECTED_,
-            PREMATCH_DONE,
-            OVERFLOW_BOT_;
+           PREMATCH_DONE, GAME_ENDED_, HUMAN_CONNECTED_;
 
         float
-            INFECTED_TIMELIMIT,
-            PLAYERWAIT_TIME,
-            MATCHSTART_TIME;
+            INFECTED_TIMELIMIT, PLAYERWAIT_TIME, MATCHSTART_TIME;
 
         int
             t0 = 100, t1 = 1000, t2 = 2000, t3 = 3000, 
-            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME,
-            BOT_SETTING_NUM,
+            SEARCH_TIME, FIRE_TIME, BOT_DELAY_TIME, BOT_SETTING_NUM, FIRE_DIST,
             PLAYER_LIFE;
-
-        List<Entity> human_List = new List<Entity>();
-        List<Entity> BOTs_List = new List<Entity>();
-        Random rnd = new Random();
-        Entity ADMIN, First_Infed_Player;
 
         bool isSurvivor(Entity player) { return player.GetField<string>("sessionteam") == "allies"; }
         char[] numChar = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-       
+
+        Random rnd = new Random();
+        Entity ADMIN, First_Infed_Player;
+        string[] BOTs_CLASS = { "axis_recipe1", "axis_recipe2", "axis_recipe3", "class0", "class1", "class2", "class4", "class5", "class6", "class6" };
+        #endregion
+
+        #region Bots side
+
         /// <summary>
-        /// HUMAN PLAYER's custom field
+        /// BOT SET class for custom fields set
+        /// </summary>
+        class B_SET
+        {
+            public Entity target { get; set; }
+            public int death { get; set; }
+            public bool fire { get; set; }
+            public bool search { get; set; }
+            public bool temp_fire { get; set; }
+            public string wep { get; set; }
+        }
+        List<B_SET> B_FIELD = new List<B_SET>();
+        Dictionary<int, int> BOT_ID = new Dictionary<int, int>();
+        List<Entity> BOTs_List = new List<Entity>();
+        #endregion
+
+        #region Human side
+        /// <summary>
+        /// HUMAN PLAYER SET class for custom fields set
         /// </summary>
         class H_SET
         {
@@ -70,21 +78,41 @@ namespace Infected
             public bool BY_SUICIDE { get; set; }
             public int LIFE { get; set; }
         }
+        List<H_SET> H_FIELD = new List<H_SET>();
+        Dictionary<int, int> H_ID = new Dictionary<int, int>();
+        List<Entity> human_List = new List<Entity>();
         #endregion
 
 
         #region server side
+        /// <summary>
+        /// server side dvar
+        /// </summary>
         void Server_SetDvar()
         {
-            string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_bootleg|mp_bravo|mp_burn_ss|mp_carbon|mp_cement|mp_courtyard_ss|mp_crosswalk_ss|mp_dome|mp_exchange|mp_hardhat|mp_hillside_ss|mp_interchange|mp_italy|mp_lambeth|mp_meteora|mp_moab|mp_mogadishu|mp_morningwood|mp_nola|mp_overwatch|mp_paris|mp_park|mp_plaza2|mp_qadeem|mp_radar|mp_restrepo_ss|mp_roughneck|mp_seatown|mp_shipbreaker|mp_six_ss|mp_terminal_cls|mp_underground|mp_village";
+            string ENTIRE_MAPLIST = "mp_aground_ss|mp_alpha|mp_boardwalk|mp_exchange|mp_burn_ss|mp_bootleg|mp_bravo|mp_courtyard_ss|mp_carbon|mp_cement|mp_interchange|mp_hillside_ss|mp_crosswalk_ss|mp_dome|mp_nola|mp_hardhat|mp_italy|mp_moab|mp_restrepo_ss|mp_lambeth|mp_meteora|mp_six_ss|mp_mogadishu|mp_overwatch|mp_aground_ss|mp_paris|mp_plaza2|mp_morningwood|mp_burn_ss|mp_qadeem|mp_radar|mp_courtyard_ss|mp_roughneck|mp_seatown|mp_hillside_ss|mp_shipbreaker|mp_terminal_cls|mp_nola|mp_underground|mp_village|mp_park|";
             MAP_NAME = Call<string>("getdvar", "mapname");
             var map_list = ENTIRE_MAPLIST.Split('|').ToList();
             int index = map_list.IndexOf(MAP_NAME);
             if (index == 35) index = 0;
 
-            //규모 작은 맵 : 0 5 mp_aground_ss mp_burn_ss mp_courtyard_ss 8 mp_hillside_ss 13 mp_nola 21
-            if (new int[] { 0, 5, 8, 13, 21 }.Contains(index)) PLAYER_LIFE = 2; else PLAYER_LIFE = 1;
-
+            int[] smallMap = { 0, 4, 7, 11, 14, 18, 21, 24, 28, 31, 34, 37 };
+            int[] largeMap = { 3, 10, 17, 27, 40 };
+            if (smallMap.Contains(index))
+            {
+                PLAYER_LIFE = 2;
+                FIRE_DIST = 600;
+            }
+            else if (largeMap.Contains(index))
+            {
+                PLAYER_LIFE = 1;
+                FIRE_DIST = 750;
+            }
+            else
+            {
+                PLAYER_LIFE = 1;
+                FIRE_DIST = 680;
+            }
             NEXT_MAP = map_list[index + 1];
             Call("setdvar", "sv_nextmap", NEXT_MAP);
 
@@ -136,7 +164,6 @@ namespace Infected
 
         #region client side
 
-        Dictionary<int, int> H_ID = new Dictionary<int, int>();
         
         void Client_init_GAME_SET(Entity player)
         {
@@ -223,7 +250,6 @@ namespace Infected
 
             player.OnNotify("HOLD_STANCE", ent =>//offhand weapon
             {
-                //player.TakeWeapon(player.Call<string>("getcurrentoffhand"));
                 if (!isSurvivor(player))
                 {
                     giveOffhandWeapon(player, "claymore_mp");

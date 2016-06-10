@@ -29,12 +29,12 @@ namespace Infected
             B.search = false;
             B.temp_fire = false;
             B.death += 1;
-
+            if (B.wep == null) B.wep = bot.CurrentWeapon;
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
             bot.Health = -1;
 
-            var weapon = bot.CurrentWeapon;
+            var weapon = B.wep;
             bot.Call(33468, weapon, 0);//setweaponammoclip
             bot.Call(33469, weapon, 0);//setweaponammostock
 
@@ -77,7 +77,7 @@ namespace Infected
                     if (isSurvivor(target))
                     {
                         var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < 600)//toDo : 멀리서 가격한 경우 추가할 것
+                        if (POD < FIRE_DIST)
                         {
                             pause = false;
                             return true;
@@ -95,7 +95,7 @@ namespace Infected
                 {
                     var POD = human.Origin.DistanceTo(bot.Origin);
 
-                    if (POD < 600)
+                    if (POD < FIRE_DIST)
                     {
                         B.target = human;
                         B.fire = true;
@@ -155,6 +155,7 @@ namespace Infected
             B.search = false;
             B.temp_fire = false;
             B.death += 1;
+            if (B.wep == null) B.wep = bot.CurrentWeapon;
 
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
@@ -165,7 +166,7 @@ namespace Infected
                 B.fire = true;
                 B.search = true;
 
-                bot.Health = 100;
+                bot.Health = 150;
                 b.Call("show");
 
 
@@ -176,8 +177,8 @@ namespace Infected
                 }
                 else
                 {
-                    bot.Call("setmovespeedscale", 1.5f);
-                    start_bot_search_slower(b, num, 500, B);
+                    bot.Call("setmovespeedscale", 2f);
+                    //start_bot_search_slower(b, num, 500, B);
                 }
             });
         }
@@ -204,7 +205,7 @@ namespace Infected
                     if (isSurvivor(target))
                     {
                         var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < 600)
+                        if (POD < FIRE_DIST)
                         {
                             pause = false;
                             return true;
@@ -223,7 +224,7 @@ namespace Infected
 
                     var POD = human.Origin.DistanceTo(bot.Origin);
 
-                    if (POD < 600)
+                    if (POD < FIRE_DIST)
                     {
                         B.target = human;
                         B.fire = true;

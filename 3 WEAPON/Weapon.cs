@@ -74,7 +74,6 @@ namespace Infected
         string[] G_SN = { "dragunov", "msr", "barrett", "rsass", "as50", "l96a1", };
 
         List<string> ATT_Lists = new List<string>() { "_rof", "_acog", "_thermal", "_reflex", "_eotech" };
-        List<H_SET> H_FIELD = new List<H_SET>();
         //string[] G_PISTOL = { "fmg9", "skorpion", "mp9", "g18" };
         //string[] G_GUN = { "mp412", "p99", "44magnum", "usp45", "fnfiveseven", "deserteagle" };
         //string[] G_SM = { "mp5", "m9", "p90", "pp90m1", "ump45", "mp7", };

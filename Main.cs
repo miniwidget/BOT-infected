@@ -10,12 +10,12 @@ namespace Infected
 {
     public partial class Infected : BaseScript
     {
-        bool TEST_ = true;
+        bool TEST_ = false;
 
         public Infected()
         {
 
-            #region 세팅 불러오기
+            #region Load Custom Setting from a set.txt file
 
             string setFile = null;
             if (TEST_)
@@ -84,7 +84,7 @@ namespace Infected
 
             PlayerConnecting += player =>
             {
-                if (PREMATCH_DONE) return;//when game map_rotate, remove all bot
+                if (PREMATCH_DONE) return;//when game map_rotate executed, remove all bot
                 if (player.Name.StartsWith("bot"))
                 {
                     Call("kick", player.EntRef);
@@ -95,7 +95,7 @@ namespace Infected
             {
                 if (player.Name.StartsWith("bot"))
                 {
-                    if (!PREMATCH_DONE)//when fast_restart executed, remove bot
+                    if (!PREMATCH_DONE)//when fast_restart executed, remove all bot
                     {
                         Call("kick", player.EntRef);
                         return;
@@ -111,7 +111,7 @@ namespace Infected
             OnNotify("prematch_done", () =>
             {
                 PREMATCH_DONE = true;
-                if (DEPLAY_BOT_) deplayBOTs();
+                if (DEPLAY_BOT_) deplayBOTs();//as soon as a game start, bots are now deploing
 
                 PlayerDisconnected += Inf_PlayerDisConnected;
 

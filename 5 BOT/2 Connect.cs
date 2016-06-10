@@ -11,17 +11,6 @@ namespace Infected
 {
     public partial class Infected
     {
-        class B_SET
-        {
-            public Entity target { get; set; }
-            public int death {get;set;}
-            public bool fire { get; set; }
-            public bool search { get; set; }
-            public bool temp_fire { get; set; }
-        }
-        List<B_SET> B_FIELD = new List<B_SET>();
-        Dictionary<int, int> BOT_ID = new Dictionary<int, int>();
-        string[] BOTs_CLASS = { "axis_recipe1", "axis_recipe2", "axis_recipe3", "class0", "class1", "class2", "class4", "class5", "class6", "class6" };
 
         #region Bot_Connected
         private void Bot_Connected(Entity bot)

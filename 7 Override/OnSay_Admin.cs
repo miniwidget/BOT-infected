@@ -15,7 +15,7 @@ namespace Infected
             for (int i = 17; i > 0; i--)
             {
                 Entity ent = Entity.GetEntity(i);
-                
+
                 if (ent == null) continue;
                 if (ent.Call<string>("getguid").Contains("bot"))
                 {
@@ -57,94 +57,53 @@ namespace Infected
             }
         }
 
-        /* void giveWeaponToBot()
-        {
-            Entity bot = BOTs_List[rnd.Next(BOTs_List.Count)];
-            bot.TakeAllWeapons();
-            var weapon = SN();
-            bot.GiveWeapon(weapon);
-            bot.SwitchToWeapon(weapon);
-            //bot.SwitchToWeaponImmediate(weapon);
-            bot.Call("setorigin", ADMIN.Origin);
-        }
-        */
-
-        /* void hideBot(string name)
-        {
-            if (name == null) name = "bot";
-            foreach (var bot in BOTs_List)
-            {
-                if (bot.Name.Contains(name))
-                {
-                    bot.Call("setorigin", ADMIN.Origin);
-                    AfterDelay(t2, () =>
-                    {
-                        bot.Call("hide");
-                        AfterDelay(t2, () =>
-                        {
-                            bot.Call("show");
-                        });
-                    });
-                    break;
-                }
-            }
-        }
-        */
 
         #endregion
 
         #region related with KILL or KICK
         void Die(string message)
         {
-            Char[] delimit = { ' ' };
-            String[] split = message.Split(delimit);
-            if (split.Length == 1)
-            {
-                sayToAdmin("die [player's name]");
-            }
+            String[] split = message.Split(' ');
+            if (split.Length == 1) sayToAdmin("die [player's name]");
 
             else if (split.Length > 1)
             {
-                for (int i = 0; i < 18; i++)
+                foreach (Entity p in Players)
                 {
-                    Entity player = Call<Entity>("getEntByNum", i);
-                    if (player != null && player.IsPlayer)
+                    if (p != null && p.IsPlayer)
                     {
-                        if (player.Name.Contains(message.Split(' ')[1]))
+                        if (p.Name.Contains(split[1]))
                         {
-                            AfterDelay(100, () => player.Call("suicide"));
+                            AfterDelay(100, () => p.Call("suicide"));
                         }
-
                     }
-
                 }
             }
         }
 
         void Magic(string message)
         {
-            Char[] delimit = { ' ' }; String[] split = message.Split(delimit);
+            String[] split = message.Split(' ');
 
             if (split.Length == 1) sayToAdmin("magic [player's name]");
 
             else if (split.Length > 1)
             {
-                for (int i = 0; i < 18; i++)
+                foreach (Entity player in Players)
                 {
-                    Entity player = Call<Entity>("getEntByNum", i);
                     if (player != null && player.IsPlayer)
                     {
-                        var targetPos = player.Origin;
-                        var startPos = ADMIN.Origin;
-
-                        startPos.Z = startPos.Z + 1000;
-                        if (player.Name.Contains(message.Split(' ')[1]))
+                        if (player.Name.Contains(split[1]))
                         {
+                            var targetPos = player.Origin;
+                            var startPos = ADMIN.Origin;
+
+                            startPos.Z = startPos.Z + 1000;
                             Entity rocket = Call<Entity>("magicbullet", "uav_strike_projectile_mp", startPos, targetPos, ADMIN);
                         }
-
                     }
                 }
+
             }
         }
 
@@ -232,7 +191,7 @@ namespace Infected
             act.Invoke();
             AfterDelay(delay, () => Utilities.ExecuteCommand(command));
         }
-        
+
         #endregion
 
         bool AdminCommand(string text)
@@ -250,14 +209,14 @@ namespace Infected
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
 
                 case "fr": KickBOTsAll(); executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed"); return false;
-                case "mr": 
+                case "mr":
                 case "nm": KickBOTsAll(); executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed"); return false;
                 case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
-                case "wm": writrMAP();return false;
+                case "wm": writrMAP(); return false;
                 case "lts": executeAfter(t1, "loadscript test\\TEST.dll", "^2Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
-                case "ults": executeAfter(t1, "unloadscript test\\TEST.dll", "^1Un Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART");return false;
+                case "ults": executeAfter(t1, "unloadscript test\\TEST.dll", "^1Un Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
             }
 
             var t = text.Split(' ');
