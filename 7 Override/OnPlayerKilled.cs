@@ -12,25 +12,24 @@ namespace Infected
     {
 
 
-        void tempFire(Entity bot, Entity human)
+        void tempFire(Entity bot, Entity target)
         {
-            int num = BOT_ID[bot.EntRef];
-            B_SET B = B_FIELD[num];
-            if (B.temp_fire == true) return;
+            
+            B_SET B = B_FIELD[bot.EntRef];
+            if (B.temp_fire || B.target != null) return;
             B.temp_fire = true;
             string weapon = B.wep;
 
             int i = 0;
             bot.OnInterval(FIRE_TIME, bb =>
             {
-                //if ( || B.target != null) return false;
-                if (i == 3||B.target != null|| GAME_ENDED_)
+                if (i == 6 || B.target != null)
                 {
                     return B.temp_fire = false;
                 }
-               
+
                 //if (i == 0) print(bot.Name + " 쏘기 시작!");
-                var ho = human.Origin; ho.Z -= 50;
+                var ho = target.Origin; ho.Z -= 50;
 
                 Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
                 bb.Call(33531, angle);//SetPlayerAngles
@@ -43,7 +42,14 @@ namespace Infected
 
         public override void OnPlayerDamage(Entity player, Entity inflictor, Entity attacker, int damage, int dFlags, string mod, string weapon, Vector3 point, Vector3 dir, string hitLoc)
         {
+
             if (attacker == null || !attacker.IsPlayer) return;
+
+
+            //if(weapon== "remote_tank_projectile_mp"|| weapon == "ugv_turret_mp")
+            //{
+            //    return;
+            //}
 
             if (attacker == player)
             {
@@ -51,31 +57,22 @@ namespace Infected
                 return;
             }
 
-            bool isBOT = player.Name.StartsWith("bot");
-
-            if (isBOT && isSurvivor(attacker))
+            if (player.Name.StartsWith("bot"))//
             {
-                if (weapon[2] == '5')
+                if (player.EntRef == RIOT_BOT_ENTREF) return;
+                if (isSurvivor(attacker))
                 {
-                    tempFire(player, attacker);
-                    return;
-                }
-             
-            }
-            else
-            {
-
-                if (mod == "MOD_MELEE" && Disable_Melee_)
-                {
-                    if (!isBOT && isSurvivor(player)) player.Health += damage;
-                    return;
-                }
-                if (USE_ADMIN_SAFE_)
-                {
-                    if (ADMIN != null && player == ADMIN) ADMIN.Health += damage;
+                    if (weapon[2] == '5')   tempFire(player, attacker);
                 }
             }
-
+            else if (mod == "MOD_MELEE" && Disable_Melee_)
+            {
+                if (isSurvivor(player)) player.Health += damage;
+            }
+            else if (USE_ADMIN_SAFE_ && ADMIN != null && player == ADMIN)
+            {
+                ADMIN.Health += damage;
+            }
 
         }
 
@@ -83,6 +80,7 @@ namespace Infected
         {
 
             if (attacker == null || !attacker.IsPlayer) return;
+
             bool BotKilled = killed.Name.StartsWith("bot");
 
             if (mod == "MOD_SUICIDE" && BotKilled) return;
@@ -92,7 +90,7 @@ namespace Infected
             if (!BotAttker)//공격자가 사람인 경우, 퍼크 주기
             {
 
-                H_SET H = H_FIELD[H_ID[attacker.EntRef]];
+                H_SET H = H_FIELD[attacker.EntRef];
                 var pc = H.PERK;
 
                 if (pc < 34 && weapon[2] == '5')//iw5
@@ -114,8 +112,7 @@ namespace Infected
                 if (BotAttker) // 봇이 사람을 죽인 경우, 봇 사격 중지
                 {
                     Utilities.RawSayAll("^1BAD Luck :) ^7" + killed.Name + " killed by " + attacker.Name);
-                    int id = BOT_ID[attacker.EntRef];
-                    B_SET B = B_FIELD[id];
+                    B_SET B = B_FIELD[attacker.EntRef];
                     B.fire = false;
                     B.target = null;
                     return;
@@ -123,9 +120,9 @@ namespace Infected
 
                 if (killed == attacker)
 
-                    H_FIELD[H_ID[killed.EntRef]].BY_SUICIDE = true;//자살로 죽음
+                    H_FIELD[killed.EntRef].BY_SUICIDE = true;//자살로 죽음
                 else
-                    H_FIELD[H_ID[killed.EntRef]].BY_SUICIDE = false;//공격으로 죽음
+                    H_FIELD[killed.EntRef].BY_SUICIDE = false;//공격으로 죽음
             }
 
         }

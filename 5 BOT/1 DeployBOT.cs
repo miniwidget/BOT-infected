@@ -14,7 +14,7 @@ namespace Infected
 
         #region 게임 시작 후, 봇 불러오기 
 
-        void deplayBOTs()
+        bool ClearBOTsInPlayers()
         {
             if (Players.Count > 0)//when fast_restart executed, remove pre allocated bots in Infinityscript
             {
@@ -28,14 +28,21 @@ namespace Infected
                 }
                 BOTs_List.Clear();
             }
+            return true;
+        }
+        void deplayBOTs()
+        {
+
+            ClearBOTsInPlayers();
 
             int fail_count=0 , max = BOT_SETTING_NUM - 1;
-            OnInterval(250, () =>
+     
+            OnInterval(100, () =>
             {
                 if (BOTs_List.Count > max || OVERFLOW_BOT_) return false;
                 if (fail_count > 5)
                 {
-                    deplayBOTs_map_init(true, "SOMETHING WRONG HAPPEND.RESTART MAP in 5 seconds",5);
+                    deplayBOTs_map_init(true, "SOMETHING WRONG HAPPEND.RESTART MAP in 5 seconds", 5);
                     return false;
                 }
 
@@ -45,7 +52,7 @@ namespace Infected
                 {
                     fail_count++;
                 }
-                
+
                 return true;
 
             });

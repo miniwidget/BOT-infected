@@ -13,11 +13,11 @@ namespace Infected
 
         public static string[] PL =
         {
-            "specialty_scavenger",
-            "specialty_quickdraw",
-            "specialty_stalker",
+             "specialty_fastreload",
+           "specialty_quickdraw",
             "specialty_longersprint",
-            "specialty_fastreload",
+            "specialty_stalker",
+            "specialty_scavenger",
             "specialty_paint",
             "specialty_quieter",
             "specialty_blindeye",

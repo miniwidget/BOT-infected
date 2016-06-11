@@ -84,7 +84,7 @@ namespace Infected
         void AxisHud(Entity player)
         {
             player.Notify("CLOSE");
-            player.Notify("CLOSE_perk");
+            //player.Notify("CLOSE_perk");
             //human_List.Remove(player);
             
 

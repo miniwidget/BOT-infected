@@ -30,7 +30,7 @@ namespace Infected
             var max = 18 - ( BOT_SETTING_NUM +1);
             if (human_List.Count > max)
             {
-                Utilities.ExecuteCommand("dropclient " + player.EntRef + "SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]");
+                Utilities.ExecuteCommand("dropclient " + player.EntRef + "\"SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]\"");
                 return;
             }
 
@@ -42,7 +42,20 @@ namespace Infected
             }
             else
             {
-                Utilities.ExecuteCommand("dropclient " + player.EntRef + " See you Next Round");
+                //Utilities.ExecuteCommand("dropclient " + player.EntRef + " \"Join Next Round please\"");
+                int who = player.EntRef;
+                H_SET H = H_FIELD[who];
+                H.LIFE = -2;
+                H.AX_WEP = 1;
+
+                player.SetField("sessionteam", "axis");
+                human_List.Remove(player);
+                player.AfterDelay(100, p =>
+                {
+                    player.Call("suicide");
+                    player.Notify("menuresponse", "changeclass", "axis_recipe4");
+                    print(player.Name + " : Infected ⊙..⊙");
+                });
             }
 
         }

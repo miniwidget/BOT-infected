@@ -10,6 +10,7 @@ namespace Infected
 {
     public partial class Infected : BaseScript
     {
+        //IMPORTANT
         bool TEST_ = false;
 
         public Infected()
@@ -65,12 +66,14 @@ namespace Infected
                             case "FIRE_TIME": if (int.TryParse(value, out i)) FIRE_TIME = i; break;
                             case "BOT_DELAY_TIME": if (int.TryParse(value, out i)) BOT_DELAY_TIME = i; break;
                             case "BOT_SETTING_NUM": if (int.TryParse(value, out i)) BOT_SETTING_NUM = i; break;
-
+                            case "PLAYER_LIFE": if (int.TryParse(value, out i)) PLAYER_LIFE = i; break;
+                            
                             case "TEST_": if (!TEST_ && bool.TryParse(value, out b)) TEST_ = b; break;
                             case "DEPLAY_BOT_": if (bool.TryParse(value, out b)) DEPLAY_BOT_ = b; break;
                             case "USE_ADMIN_SAFE_": if (bool.TryParse(value, out b)) USE_ADMIN_SAFE_ = b; break;
                             case "SUICIDE_BOT_": if (bool.TryParse(value, out b)) SUICIDE_BOT_ = b; break;
                             case "Disable_Melee_": if (bool.TryParse(value, out b)) Disable_Melee_ = b; break;
+                            
                         }
                     }
 
@@ -118,6 +121,12 @@ namespace Infected
                 OnNotify("game_ended", (level) =>
                 {
                     GAME_ENDED_ = true;
+                    foreach(var v in B_FIELD)
+                    {
+                        v.fire = false;
+                        v.target = null;
+                        v.death += 1;
+                    }
                     AfterDelay(20000, () => Utilities.ExecuteCommand("map_rotate"));
                 });
             });

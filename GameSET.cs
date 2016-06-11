@@ -48,12 +48,11 @@ namespace Infected
             public Entity target { get; set; }
             public int death { get; set; }
             public bool fire { get; set; }
-            public bool search { get; set; }
             public bool temp_fire { get; set; }
             public string wep { get; set; }
         }
-        List<B_SET> B_FIELD = new List<B_SET>();
-        Dictionary<int, int> BOT_ID = new Dictionary<int, int>();
+        List<B_SET> B_FIELD = new List<B_SET>(18);
+        //Dictionary<int, int> BOT_ID = new Dictionary<int, int>();
         List<Entity> BOTs_List = new List<Entity>();
         #endregion
 
@@ -77,9 +76,10 @@ namespace Infected
             public int AX_WEP { get; set; }
             public bool BY_SUICIDE { get; set; }
             public int LIFE { get; set; }
+            public bool RESPAWN { get; set; }
         }
-        List<H_SET> H_FIELD = new List<H_SET>();
-        Dictionary<int, int> H_ID = new Dictionary<int, int>();
+        List<H_SET> H_FIELD = new List<H_SET>(18);
+        //Dictionary<int, int> H_ID = new Dictionary<int, int>();
         List<Entity> human_List = new List<Entity>();
         #endregion
 
@@ -94,28 +94,25 @@ namespace Infected
             MAP_NAME = Call<string>("getdvar", "mapname");
             var map_list = ENTIRE_MAPLIST.Split('|').ToList();
             int index = map_list.IndexOf(MAP_NAME);
-            if (index == 35) index = 0;
 
             int[] smallMap = { 0, 4, 7, 11, 14, 18, 21, 24, 28, 31, 34, 37 };
             int[] largeMap = { 3, 10, 17, 27, 40 };
+            if (PLAYER_LIFE == 0) PLAYER_LIFE = 2;
             if (smallMap.Contains(index))
             {
-                print("■ SMALL MAP");
-                PLAYER_LIFE = 2;
+                PLAYER_LIFE +=1;
                 FIRE_DIST = 600;
             }
             else if (largeMap.Contains(index))
             {
-                print("■ LARGE MAP");
-                PLAYER_LIFE = 1;
                 FIRE_DIST = 850;
             }
             else
             {
-                print("■ NORMAL MAP");
-                PLAYER_LIFE = 1;
                 FIRE_DIST = 750;
             }
+
+            if (index == map_list.Count-1) index = 0;
             NEXT_MAP = map_list[index + 1];
             Call("setdvar", "sv_nextmap", NEXT_MAP);
 
@@ -143,6 +140,11 @@ namespace Infected
             //Call("setdvar", "g_gametype", GAMETYPE);
 
             Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
+            for(int i = 0; i < 18; i++)
+            {
+                B_FIELD.Add(new B_SET());
+                H_FIELD.Add(new H_SET());
+            }
 
         }
         void writrMAP()
@@ -173,19 +175,12 @@ namespace Infected
             int who = human_List.Count;
             human_List.Add(player);
 
-            if (H_ID.ContainsKey(player.EntRef))
-            {
-                H_SET H = H_FIELD[H_ID[player.EntRef]];
-                H.LIFE = PLAYER_LIFE;
-                H.PERK = 0;
-                H.AX_WEP = 0;
-                H.BY_SUICIDE = false;
-            }
-            else
-            {
-                H_FIELD.Add(new H_SET() { LIFE = PLAYER_LIFE });
-                H_ID.Add(player.EntRef, who);
-            }
+            H_SET H = H_FIELD[player.EntRef];
+            H.LIFE = PLAYER_LIFE;
+            H.PERK = 2;
+            H.AX_WEP = 0;
+            H.BY_SUICIDE = false;
+
             #region SetClientDvar
 
             player.SetClientDvar("lowAmmoWarningNoAmmoColor2", "0 0 0 0");

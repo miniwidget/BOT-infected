@@ -67,9 +67,10 @@ namespace Infected
             else if (length == 2)
             {
                 if (!survivor) return;
-                var tx = texts[1]; if (tx.Length != 1 || tx == " ") return;
-                var value = tx[0]; if (!numChar.Contains(value)) return;
-                int i = int.Parse(value.ToString());
+                var tx = texts[1];
+                int i = 0;
+                if (!int.TryParse(tx, out i)) return;
+                if (i > 9) return;
 
                 switch (texts[0])
                 {

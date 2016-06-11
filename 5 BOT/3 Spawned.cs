@@ -16,23 +16,22 @@ namespace Infected
         //봇 스폰 시작
         private void spawned_bot(Entity bot)
         {
-            int num = BOT_ID[bot.EntRef];
-            if (num == -1)
-            {
-                removeBot(bot);
-                return;
-            }
+            if (GAME_ENDED_) return;
 
+            int num = bot.EntRef;
+            if (num == -1) return;
+            
             B_SET B = B_FIELD[num];
             B.target = null;
             B.fire = false;
-            B.search = false;
             B.temp_fire = false;
             B.death += 1;
             if (B.wep == null) B.wep = bot.CurrentWeapon;
             bot.Call("hide");
             bot.Call("setmovespeedscale", 0f);
-            if(num!=0)bot.Health = -1;
+
+
+            if (num != 0) bot.Health = -1;//Not Jugg bot
 
             var weapon = B.wep;
             bot.Call(33468, weapon, 0);//setweaponammoclip
@@ -40,9 +39,8 @@ namespace Infected
 
             bot.AfterDelay(BOT_DELAY_TIME, b =>
             {
+                if (GAME_ENDED_) return;
                 B.fire = true;
-                B.search = true;
-
                 b.Call("show");
 
                 if (num != 0)//GENERAL
@@ -55,40 +53,31 @@ namespace Infected
                     bot.Call("setmovespeedscale", 0.6f);
                 }
 
-                start_bot_search(b, num, weapon, B);
+                start_bot_search(b, B);
             });
-
         }
 
         //봇 목표물 찾기 루프
-        private void start_bot_search(Entity bot, int num, string weapon, B_SET B)
+        private void start_bot_search(Entity bot, B_SET B)
         {
             bool pause = false;
-
             int death = B.death;
+            string weapon = B.wep;
+
             bot.OnInterval(SEARCH_TIME, b =>
             {
-                if (GAME_ENDED_ || !B.search) return false;
                 if (death != B.death) return false;
-
-                if (!HUMAN_CONNECTED_)
-                {
-                    B.fire = false;
-                    return true;
-                }
+                if (!HUMAN_CONNECTED_) return !(pause = false);
 
                 var target = B.target;
 
                 if (target != null)//이미 타겟을 찾은 경우
                 {
-                    if (isSurvivor(target))
+                    if (human_List.Contains(target))
                     {
+                        //if (TEST_) return true;
                         var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < FIRE_DIST)
-                        {
-                            pause = false;
-                            return true;
-                        }
+                        if (POD < FIRE_DIST) return !(pause = false); 
                     }
 
                     B.target = null;
@@ -107,12 +96,11 @@ namespace Infected
                         B.target = human;
                         B.fire = true;
                         pause = false;
-                        //int i = 0;
+
                         b.OnInterval(FIRE_TIME, bb =>
                         {
-                            if (pause) return false;
-                            if (!B.fire || GAME_ENDED_ || human == null) return false;
-                            //print(bb.Name + bot_fire[num] + i++);
+                            if (pause || !B.fire ) return false;
+
                             var ho = human.Origin; ho.Z -= 50;
 
                             Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
@@ -125,7 +113,6 @@ namespace Infected
                     }
 
                 }
-
                 return true;
 
             });
@@ -136,21 +123,14 @@ namespace Infected
 
         #region 느린 봇
 
-        void removeBot(Entity bot)
-        {
-            print("■ IMPORTANT ■ " + bot.Name + "bid = -1");
-            BOTs_List.Remove(bot);
-            Call("kick", bot.EntRef);
-        }
         void spawned_bot_slower(Entity bot)
         {
-            int num = BOT_ID[bot.EntRef];
-            if (num == -1)
-            {
-                removeBot(bot);
-                return;
-            }
-            if (num == 1)
+            if (GAME_ENDED_) return;
+
+            int num = bot.EntRef;
+            if (num == -1) return;
+            
+            if (num == RPG_BOT_ENTREF)
             {
                 bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
                 bot.Call(33469, "rpg_mp", 0);//setweaponammostock
@@ -159,7 +139,6 @@ namespace Infected
             B_SET B = B_FIELD[num];
             B.target = null;
             B.fire = false;
-            B.search = false;
             B.temp_fire = false;
             B.death += 1;
             if (B.wep == null) B.wep = bot.CurrentWeapon;
@@ -168,63 +147,57 @@ namespace Infected
             bot.Call("setmovespeedscale", 0f);
             bot.Health = -1;
 
+
             bot.AfterDelay(10000, b =>
             {
+                if (GAME_ENDED_) return;
+
                 B.fire = true;
-                B.search = true;
 
                 bot.Health = 150;
                 b.Call("show");
 
 
-                if (num == 1)
+                if (num == RPG_BOT_ENTREF)//rpg bot
                 {
                     bot.Call("setmovespeedscale", 0.7f);
-                    start_bot_search_slower(b, num, 1500, B);
+                    start_bot_search_slower(b, B);
                 }
-                else
+                else//riot bot
                 {
                     bot.Call("setmovespeedscale", 2f);
-                    //start_bot_search_slower(b, num, 500, B);
                 }
             });
         }
-        private void start_bot_search_slower(Entity bot, int num, int fire_time, B_SET B)
+        private void start_bot_search_slower(Entity bot, B_SET B)
         {
             bool pause = false;
             int death = B.death;
 
             bot.OnInterval(SEARCH_TIME, b =>
             {
-                if (GAME_ENDED_ || !B.search) return false;
                 if (death != B.death) return false;
-
-                if (!HUMAN_CONNECTED_)
-                {
-                    B.fire = false;
-                    return true;
-                }
+                if (!HUMAN_CONNECTED_) return !(pause = false);
+                
 
                 var target = B.target;
-
                 if (target != null)//이미 타겟을 찾은 경우
                 {
-                    if (isSurvivor(target))
+                    if (human_List.Contains(target))
                     {
+                        //if (TEST_) return true;
                         var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < FIRE_DIST)
-                        {
-                            pause = false;
-                            return true;
-                        }
+                        if (POD < FIRE_DIST) return !(pause = false);
+
                     }
 
                     B.target = null; //타겟과 거리가 멀어진 경우, 타겟 제거
                     B.fire = false;
-                    if (num == 1) bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
+                    bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
                 }
 
                 pause = true;
+                //B.rooping = true;
                 //타겟 찾기 시작
                 foreach (Entity human in human_List)
                 {
@@ -236,18 +209,18 @@ namespace Infected
                         B.target = human;
                         B.fire = true;
                         pause = false;
-                        if (num == 1) human.Call(33466, "missile_incoming");
+                        human.Call(33466, "missile_incoming");
 
-                        b.OnInterval(fire_time, bb =>
+                        b.OnInterval(1500, bb =>
                         {
-                            if (pause) return false;
-                            if (!B.fire || GAME_ENDED_ || human == null) return false;
+
+                            if (pause || !B.fire ) return false;
 
                             var ho = human.Origin; ho.Z -= 50;
 
                             Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
                             bb.Call(33531, angle);//SetPlayerAngles
-                            if (num == 1) bb.Call(33468, "rpg_mp", 1);//setweaponammoclip
+                            bb.Call(33468, "rpg_mp", 1);//setweaponammoclip
                             return true;
                         });
 

@@ -12,7 +12,7 @@ namespace Infected
         #region related with BOT
         void KickBOTsAll()
         {
-            for (int i = 17; i > 0; i--)
+            for (int i = 0; i < 18; i++)
             {
                 Entity ent = Entity.GetEntity(i);
 
@@ -118,7 +118,7 @@ namespace Infected
 
             else if (split.Length > 1)
             {
-                for (int i = 0; i < 17; i++)
+                for (int i = 0; i < 18; i++)
                 {
                     Entity player = Call<Entity>("getEntByNum", i);
                     if (player != null && player.IsPlayer)
@@ -177,28 +177,41 @@ namespace Infected
         {
             AfterDelay(t0, () => Utilities.RawSayTo(ADMIN, m));
         }
-        void executeAfter(int delay, string command)
-        {
-            AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        }
-        void executeAfter(int delay, string command, string sayAll)
-        {
-            Utilities.RawSayAll(sayAll);
-            AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        }
-        void executeAfter(int delay, string command, Action act)
-        {
-            act.Invoke();
-            AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        }
+        //void executeAfter(int delay, string command)
+        //{
+        //    ClearBOTsInPlayers();
+        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
+        //}
+        //void executeAfter(int delay, string command, string sayAll)
+        //{
+        //    ClearBOTsInPlayers();
+        //    Utilities.RawSayAll(sayAll);
+        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
+        //}
+        //void executeAfter(int delay, string command, Action act)
+        //{
+        //    ClearBOTsInPlayers();
+        //    act.Invoke();
+        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
+        //}
 
         #endregion
 
+        void botName()
+        {
+            foreach(Entity bot in BOTs_List)
+            {
+                //print(bot.Name);
+                bot.Health = -1;
+                bot.Call("setorigin", ADMIN.Origin);
+            }
+        }
         bool AdminCommand(string text)
         {
 
             switch (text)
             {
+                case "bn": botName();return false;
                 case "pos": moveBot(null); return false;
                 case "ab": addBot(); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
@@ -208,15 +221,44 @@ namespace Infected
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
 
-                case "fr": KickBOTsAll(); executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed"); return false;
+                case "fr":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("fast_restart"));
+                    //executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed");
+                    return false;
                 case "mr":
-                case "nm": KickBOTsAll(); executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed"); return false;
-                case "restart": KickBOTsAll(); executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed"); return false;
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("map_rotate"));
+                    //executeAfter(t2, "map_rotate", "^2NEXT MAP ^7executed");
+                    return false;
+                case "nm":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("map " + NEXT_MAP));
+                    //executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed");
+                    return false;
+                case "restart":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("map_restart"));
+                    //executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed");
+                    return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
                 case "wm": writrMAP(); return false;
-                case "lts": executeAfter(t1, "loadscript test\\TEST.dll", "^2Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
-                case "ults": executeAfter(t1, "unloadscript test\\TEST.dll", "^1Un Load Test Script"); executeAfter(t1, "fast_restart", "^2BEGIN ^7RESTART"); return false;
+                case "lts":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("loadscript test\\TEST.dll"));
+                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
+                    return false;
+                case "ults":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("unloadscript test\\TEST.dll"));
+                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
+                     return false;
+                case "ulis":
+                    KickBOTsAll();
+                    AfterDelay(t1, () => Utilities.ExecuteCommand("unloadscript test\\Infected.dll"));
+                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
+                    return false;
             }
 
             var t = text.Split(' ');
@@ -233,17 +275,24 @@ namespace Infected
                     case "k": Kick(text); return false;
                     case "magic": Magic(text); return false;
                     case "so": ADMIN.Call("playlocalsound", value); return false;
-                    case "map": executeAfter(t2, "map " + value, "^2Map changed^7 to " + value + " executed"); return false;
-
-                    case "l":
-                        script(value, true);
-                        executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
+                    case "map":
+                        KickBOTsAll();
+                        AfterDelay(t1, () =>
+                        {
+                            Utilities.ExecuteCommand("map " + value);
+                        });
+                        //executeAfter(t2, "map " + value, "^2Map changed^7 to " + value + " executed");
                         return false;
 
-                    case "ul":
-                        script(value, false);
-                        executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
-                        return false;
+                    //case "l":
+                    //    script(value, true);
+                    //    executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
+                    //    return false;
+
+                    //case "ul":
+                    //    script(value, false);
+                    //    executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
+                    //    return false;
                 }
             }
 
