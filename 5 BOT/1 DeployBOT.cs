@@ -37,7 +37,7 @@ namespace Infected
 
             int fail_count=0 , max = BOT_SETTING_NUM - 1;
      
-            OnInterval(100, () =>
+            OnInterval(250, () =>
             {
                 if (BOTs_List.Count > max || OVERFLOW_BOT_) return false;
                 if (fail_count > 5)

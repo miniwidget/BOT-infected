@@ -10,8 +10,9 @@ BOT_DELAY_TIME=6100//spawan delay due to SERVER CRASH
 
 BOT_SETTING_NUM=10//I tested it by 10 numbers. If increase numbers, server can be crash. I can not ensure ^^.
 INFECTED_TIMELIMIT=8//overall game time
-PLAYERWAIT_TIME=10//wait player time before start game
-MATCHSTART_TIME=10//wait time before start game
+PLAYERWAIT_TIME=1//wait player time before start game
+MATCHSTART_TIME=1//wait time before start game
+PLAYER_LIFE=2//player life, if maps are small, players are get one life more
 
 TEST_=false//test mode
 DEPLAY_BOT_=true//enable or disable deploing bots

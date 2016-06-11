@@ -22,7 +22,6 @@ namespace Infected
             if (TEST_)
             {
                 setFile = "admin\\test\\test_Infected_SET.txt";
-
             }
             else
             {
@@ -126,6 +125,10 @@ namespace Infected
                         v.fire = false;
                         v.target = null;
                         v.death += 1;
+                    }
+                    foreach(Entity bot in BOTs_List)
+                    {
+                        bot.Call("setmovespeedscale", 0f);
                     }
                     AfterDelay(20000, () => Utilities.ExecuteCommand("map_rotate"));
                 });

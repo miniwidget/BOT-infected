@@ -33,6 +33,7 @@ namespace Infected
         #region human_spawned
         void human_spawned(Entity player)//LIFE 1 or 2
         {
+            if (GAME_ENDED_) return;
 
             H_SET H = H_FIELD[player.EntRef];
 
@@ -72,7 +73,6 @@ namespace Infected
                 human_List.Remove(player);
                 player.AfterDelay(100, p =>
                 {
-
                     player.Call("suicide");
                     player.Notify("menuresponse", "changeclass", "axis_recipe4");
                     print(player.Name + " : Infected ⊙..⊙");

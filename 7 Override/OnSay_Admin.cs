@@ -177,23 +177,6 @@ namespace Infected
         {
             AfterDelay(t0, () => Utilities.RawSayTo(ADMIN, m));
         }
-        //void executeAfter(int delay, string command)
-        //{
-        //    ClearBOTsInPlayers();
-        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        //}
-        //void executeAfter(int delay, string command, string sayAll)
-        //{
-        //    ClearBOTsInPlayers();
-        //    Utilities.RawSayAll(sayAll);
-        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        //}
-        //void executeAfter(int delay, string command, Action act)
-        //{
-        //    ClearBOTsInPlayers();
-        //    act.Invoke();
-        //    AfterDelay(delay, () => Utilities.ExecuteCommand(command));
-        //}
 
         #endregion
 
@@ -205,6 +188,12 @@ namespace Infected
                 bot.Health = -1;
                 bot.Call("setorigin", ADMIN.Origin);
             }
+        }
+        void ResetGame(string command)
+        {
+            if (!TEST_) command = command.Replace("test\\", "");
+            KickBOTsAll();
+            AfterDelay(t1, () => Utilities.ExecuteCommand(command));
         }
         bool AdminCommand(string text)
         {
@@ -221,42 +210,23 @@ namespace Infected
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
 
-                case "fr":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("fast_restart"));
-                    //executeAfter(t2, "fast_restart", "^2RESTART MAP ^7executed");
-                    return false;
-                case "mr":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("map_rotate"));
-                    //executeAfter(t2, "map_rotate", "^2NEXT MAP ^7executed");
-                    return false;
-                case "nm":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("map " + NEXT_MAP));
-                    //executeAfter(t2, "map " + NEXT_MAP, "^2NEXT MAP ^7executed");
-                    return false;
-                case "restart":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("map_restart"));
-                    //executeAfter(t2, "map_restart", "^2RESTART MAP ^7executed");
-                    return false;
+                case "fr": ResetGame("fast_restart"); return false;
+                case "mr":   ResetGame("map_rotate"); return false;
+                case "nm":ResetGame("map " + NEXT_MAP); return false;
+                case "restart":  ResetGame("map_restart");  return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
                 case "wm": writrMAP(); return false;
                 case "lts":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("loadscript test\\TEST.dll"));
+                    ResetGame("loadscript test\\TEST.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
                     return false;
                 case "ults":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("unloadscript test\\TEST.dll"));
+                    ResetGame("unloadscript test\\TEST.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
                      return false;
                 case "ulis":
-                    KickBOTsAll();
-                    AfterDelay(t1, () => Utilities.ExecuteCommand("unloadscript test\\Infected.dll"));
+                    ResetGame("unloadscript test\\Infected.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
                     return false;
             }
@@ -275,14 +245,7 @@ namespace Infected
                     case "k": Kick(text); return false;
                     case "magic": Magic(text); return false;
                     case "so": ADMIN.Call("playlocalsound", value); return false;
-                    case "map":
-                        KickBOTsAll();
-                        AfterDelay(t1, () =>
-                        {
-                            Utilities.ExecuteCommand("map " + value);
-                        });
-                        //executeAfter(t2, "map " + value, "^2Map changed^7 to " + value + " executed");
-                        return false;
+                    case "map": ResetGame("map " + value); return false;
 
                     //case "l":
                     //    script(value, true);
