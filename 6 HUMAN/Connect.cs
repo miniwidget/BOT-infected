@@ -10,7 +10,31 @@ namespace Infected
 {
     public partial class Infected
     {
+        void ADMIN_BUFF()
+        {
+            ADMIN.Call("notifyonplayercommand", "SPECT", "+strafe");
+            bool spect = false;
+            ADMIN.OnNotify("SPECT", a =>
+            {
+                if (!spect)
+                {
+                    ADMIN.Call("allowspectateteam", "freelook", true);
+                    ADMIN.SetField("sessionstate", "spectator");
+                }
+                else
+                {
+                    ADMIN.Call("allowspectateteam", "freelook", false);
+                    ADMIN.SetField("sessionstate", "playing");
+                }
+                spect = !spect;
+            });
+            if (TEST_)
+            {
+                ADMIN.Call("thermalvisionfofoverlayon");
+                ADMIN.Call("setmovespeedscale", 1.5f);
+            }
 
+        }
         void Human_Connected(Entity player)
         {
 
@@ -18,13 +42,8 @@ namespace Infected
 
             if (player.Name == ADMIN_NAME)
             {
-
                 ADMIN = player;
-                if (TEST_)
-                {
-                    player.Call("thermalvisionfofoverlayon");
-                    player.Call("setmovespeedscale", 1.5f);
-                }
+                ADMIN_BUFF();
             }
 
             var max = 18 - ( BOT_SETTING_NUM +1);
@@ -43,19 +62,8 @@ namespace Infected
             else
             {
                 //Utilities.ExecuteCommand("dropclient " + player.EntRef + " \"Join Next Round please\"");
-                int who = player.EntRef;
-                H_SET H = H_FIELD[who];
-                H.LIFE = -2;
-                H.AX_WEP = 1;
-
-                player.SetField("sessionteam", "axis");
-                human_List.Remove(player);
-                player.AfterDelay(100, p =>
-                {
-                    player.Call("suicide");
-                    player.Notify("menuresponse", "changeclass", "axis_recipe4");
-                    print(player.Name + " : Infected ⊙..⊙");
-                });
+                H_SET H = H_FIELD[player.EntRef];
+                H.LIFE = -1;
             }
 
         }

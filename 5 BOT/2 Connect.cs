@@ -193,14 +193,14 @@ namespace Infected
         bool getTeamState()
         {
             int alive = 0, max = BOTs_List.Count;
-            string test = null;
+            //string test = null;
             foreach (Entity bot in BOTs_List)
             {
                 if (isSurvivor(bot)) alive++;
 
-                test += " " + bot.EntRef ;
+                //test += " " + bot.EntRef ;
             }
-            print("■ BOTs: " + max + " AXIS: " + (max - alive) + " ALLIES: " + alive + " Inf : " + First_Infed_Player.Name + test);
+            print("■ BOTs: " + max + " AXIS: " + (max - alive) + " ALLIES: " + alive + " Inf : " + First_Infed_Player.Name );
             //print("■ HUMANs: " +human_List.Count);
 
             return false;

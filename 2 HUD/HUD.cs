@@ -9,9 +9,12 @@ namespace Infected
 {
     public partial class Infected
     {
-
+        
         void Server_Hud()
         {
+            
+            var x = HudElem.NewHudElem();
+            
             //HudElem staticBG = HudElem.NewHudElem();
             //staticBG.HorzAlign = "fullscreen";
             //staticBG.VertAlign = "fullscreen";
@@ -48,7 +51,25 @@ namespace Infected
             //    INFO1.Alpha = 0.7f;
             //});
         }
+        string ALLIES_HUD_TEXTS =
+            @"
+^7TYPE FOLLOWING
+^2AP ^74 AKIMBO PISTOL
+^2AG ^76 AKIMBO GUN
+^2AR ^79 ASSAU RIFFLE
+^2SM ^76 SUB M_GUN
+^2LM ^75 LIGHT M_GUN
+^2SG ^74 SHOT GUN
+^2SN ^76 SNIPE GUN
 
+
+^7PRESS KEY
+^2[{+strafe}] ^7AMMO
+^2[{+movedown}] ^7VIEWSCOPE
+^2[{+prone}] ^7ATTATCHMENT
+^2[{+stance}] ^7";
+
+     
         void AlliesHud(Entity player,string offhand)
         {
             HudElem allies_info_hud = HudElem.CreateFontString(player, "hudbig", 0.4f);
@@ -66,7 +87,8 @@ namespace Infected
             allies_weap_hud.HideWhenInMenu = true;
             allies_weap_hud.Foreground = false;
             allies_weap_hud.Alpha = 0f;
-            allies_weap_hud.SetText("^7type following\n^2ap ^74 akimbo pistol\n^2ag ^76 akimbo gun\n^2ar ^79 assau riffle\n^2sm ^76 sub m_gun\n^2lm ^75 light m_gun\n^2sg ^74 shot gun\n^2sn ^76 snipe gun\n\n^7bind key at option\n^2[{+movedown}] ^7viewscope\n^2[{+prone}] ^7attatchment\n^2[{+stance}] ^7" + offhand);
+
+            allies_weap_hud.SetText(ALLIES_HUD_TEXTS + offhand);
 
             allies_info_hud.Alpha = 0.8f; allies_weap_hud.Alpha = 0.6f;
             allies_weap_hud.Call("moveovertime", 2f);

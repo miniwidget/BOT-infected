@@ -10,13 +10,14 @@ namespace Infected
 {
     public partial class Infected
     {
+        //if(weapon== "remote_tank_projectile_mp"|| weapon == "ugv_turret_mp")
+        //{
+        //    return;
+        //}
 
-
-        void tempFire(Entity bot, Entity target)
+        void tempFire(B_SET B, Entity bot, Entity target)
         {
-            
-            B_SET B = B_FIELD[bot.EntRef];
-            if (B.temp_fire || B.target != null) return;
+
             B.temp_fire = true;
             string weapon = B.wep;
 
@@ -28,8 +29,8 @@ namespace Infected
                     return B.temp_fire = false;
                 }
 
-                //if (i == 0) print(bot.Name + " 쏘기 시작!");
-                var ho = target.Origin; ho.Z -= 50;
+                var ho = target.Origin;
+                ho.Z -= 50;
 
                 Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
                 bb.Call(33531, angle);//SetPlayerAngles
@@ -42,36 +43,49 @@ namespace Infected
 
         public override void OnPlayerDamage(Entity player, Entity inflictor, Entity attacker, int damage, int dFlags, string mod, string weapon, Vector3 point, Vector3 dir, string hitLoc)
         {
-
-            if (attacker == null || !attacker.IsPlayer) return;
-
-
-            //if(weapon== "remote_tank_projectile_mp"|| weapon == "ugv_turret_mp")
-            //{
-            //    return;
-            //}
-
-            if (attacker == player)
+            //BOTs side
+            if (player.Name.StartsWith("bot"))
             {
-                if (weapon == "rpg_mp") player.Health += damage;
+                if (attacker == player && weapon == "rpg_mp")
+                {
+                    player.Health += damage;
+                    return;
+                }
+
+                var entref = player.EntRef;
+                if (entref == RIOT_BOT_ENTREF) return;
+                if (human_List.Contains(attacker))
+                {
+                    if (weapon[2] == '5')
+                    {
+                        //if (G_SN.Contains(weapon.Split('_')[1])) player.Health = 0;//iw5_dragunov_mp_dragunovscopevz_xmags
+                        //else
+                        //{
+                        B_SET B = B_FIELD[entref];
+                        if (B.temp_fire || B.target != null) return;
+
+                        tempFire(B, player, attacker);
+                        //}
+                    }
+                }
                 return;
             }
 
-            if (player.Name.StartsWith("bot"))//
+            //HUMAN side
+            if (mod == "MOD_FALLING")
             {
-                if (player.EntRef == RIOT_BOT_ENTREF) return;
-                if (isSurvivor(attacker))
-                {
-                    if (weapon[2] == '5')   tempFire(player, attacker);
-                }
+                player.Health += damage;
+                return;
             }
-            else if (mod == "MOD_MELEE" && Disable_Melee_)
+            if (mod == "MOD_MELEE")
             {
-                if (isSurvivor(player)) player.Health += damage;
+                if (human_List.Contains(player)) player.Health += damage;
+                return;
             }
-            else if (USE_ADMIN_SAFE_ && ADMIN != null && player == ADMIN)
+            if (USE_ADMIN_SAFE_)
             {
-                ADMIN.Health += damage;
+                if( ADMIN != null && player == ADMIN) player.Health += damage;
+                return;
             }
 
         }

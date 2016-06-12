@@ -31,6 +31,7 @@ namespace Infected
         #endregion
 
         #region human_spawned
+
         void human_spawned(Entity player)//LIFE 1 or 2
         {
             if (GAME_ENDED_) return;
@@ -59,7 +60,7 @@ namespace Infected
                    
                     player.AfterDelay(100, x =>
                     {
-                        giveWeaponTo(player, getRandomWeapon());
+                        giveInitalWeaponToHuman(player, H);
                         H.RESPAWN = false;
                     });
                 }
@@ -91,7 +92,7 @@ namespace Infected
                 else
                 {
 
-                    if (!H.BY_SUICIDE)
+                    if (!H.BY_SUICIDE)//by attack
                     {
                         H.AX_WEP += 1;
                         AxisWeapon_by_Attack(player, H.AX_WEP);

@@ -16,9 +16,11 @@ namespace Infected
              "press ^2ESC ^7and goto ^2OPTIONS",
              "goto ^2CONTROLS ^7 -> ^2MOVEMENT",
              "bind follwing keys",
-             "1. ^2HOLD CROUCH ^7to any key",
-             "2. ^2HOLD PRONE ^7to any key",
-             "3. ^2CHANGE STANCE ^7to any key"
+
+             "1. ^2HOLD STRAFE ^7to any key",
+             "2. ^2HOLD CROUCH ^7to any key",
+             "3. ^2HOLD PRONE ^7to any key",
+             "4. ^2CHANGE STANCE ^7to any key"
         };
         string[] MESSAGES_ALLIES_INFO_W =
         {
@@ -30,9 +32,9 @@ namespace Infected
             "^2[ ^7AR ^2] TO GET ASSAULT RIFFLE",
             "^2[ ^7SM ^2] TO GET SUB MACHINE GUN",
             "^2[ ^7LM ^2] TO GET LIGHT MACHINE GUN",
-            "^2[ ^7SN ^2] TO GET SNIPE GUN",
             "^2[ ^7SG ^2] TO GET SHOT GUN",
-        };
+            "^2[ ^7SN ^2] TO GET SNIPE GUN",
+      };
         string[] MESSAGES_AXIS_INFO_W =
         {
             "^7TYPE ^2[ ^7FOLLOWING ^2] ^7TO GET WEAPONS",

@@ -137,25 +137,6 @@ namespace Infected
 
         #endregion
 
-        #region BUFF
-        bool specMode;
-        void changeSpecMode()
-        {
-            specMode = !specMode;
-            if (specMode)
-            {
-                ADMIN.Call("allowspectateteam", "freelook", true);
-                ADMIN.SetField("sessionstate", "spectator");
-            }
-            else
-            {
-                ADMIN.Call("allowspectateteam", "freelook", false);
-                ADMIN.SetField("sessionstate", "playing");
-            }
-
-        }
-        #endregion
-
         #region 관리자 커맨드 메서드
 
         void script(string name, bool load)
@@ -179,15 +160,46 @@ namespace Infected
         }
 
         #endregion
+        /*
+level.bcSounds["reload"] = "inform_reloading_generic";
+level.bcSounds["frag_out"] = "inform_attack_grenade";
+level.bcSounds["flash_out"] = "inform_attack_flashbang";
+level.bcSounds["smoke_out"] = "inform_attack_smoke";
+level.bcSounds["conc_out"] = "inform_attack_stun";
+level.bcSounds["c4_plant"] = "inform_attack_thwc4";
+level.bcSounds["claymore_plant"] = "inform_plant_claymore";
+level.bcSounds["semtex_out"] = "semtex_use";
+level.bcSounds["kill"] = "inform_killfirm_infantry";
+level.bcSounds["casualty"] = "inform_casualty_generic";
+level.bcSounds["suppressing_fire"] = "cmd_suppressfire";
+	
+level.bcSounds["semtex_incoming"] = "semtex_incoming";
+level.bcSounds["c4_incoming"] = "c4_incoming";
+level.bcSounds["flash_incoming"] = "flash_incoming";
+level.bcSounds["stun_incoming"] = "stun_incoming";
+level.bcSounds["grenade_incoming"] = "grenade_incoming";
+level.bcSounds["rpg_incoming"] = "rpg_incoming";
 
-        void botName()
+        */
+        void playSound(string soundname)
         {
-            foreach(Entity bot in BOTs_List)
-            {
-                //print(bot.Name);
-                bot.Health = -1;
-                bot.Call("setorigin", ADMIN.Origin);
-            }
+            //RU_0_rpg_incoming
+            //US_0_rpg_incoming
+            string voicePrefix = Call<string>("tableLookup", "mp/factionTable.csv", 0, "allies", 7) + "0_";
+            string bcSoounds = "rpg_incoming";
+            string soundAlias = voicePrefix + bcSoounds;//rpg_incoming
+
+            Call("playSoundToTeam", soundAlias, "allies", ADMIN);
+            print(soundAlias);
+            // ADMIN.Call("playsoundtoplayer", soundname);
+            //var here = "enemy_" + Function.Call<string>("tableLookup", "mp/killstreakTable.csv", 0, 1, 10);
+            //print(here);
+            //foreach(Entity bot in BOTs_List)
+            //{
+            //    //print(bot.Name);
+            //    bot.Health = -1;
+            //    bot.Call("setorigin", ADMIN.Origin);
+            //}
         }
         void ResetGame(string command)
         {
@@ -200,23 +212,27 @@ namespace Infected
 
             switch (text)
             {
-                case "bn": botName();return false;
+                case "t1": giveOffhandWeapon(ADMIN, "throwingknife_mp"); break;
+                //case "t2": giveOffhandWeapon(ADMIN, "c4_mp"); break;
+                case "t3": giveOffhandWeapon(ADMIN, "frag_grenade_mp"); break;
+                case "t4": giveOffhandWeapon(ADMIN, "semtex_mp"); break;
+                case "t5": giveOffhandWeapon(ADMIN, "bouncingbetty_mp"); break;
+                case "t6": giveOffhandWeapon(ADMIN, "claymore_mp"); break;
+
                 case "pos": moveBot(null); return false;
-                case "ab": addBot(); return false;
+                //case "ab": addBot(); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
 
-                case "s": changeSpecMode(); return false;
                 case "1": ADMIN.Call("thermalvisionfofoverlayon"); return false;
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
 
                 case "fr": ResetGame("fast_restart"); return false;
-                case "mr":   ResetGame("map_rotate"); return false;
-                case "nm":ResetGame("map " + NEXT_MAP); return false;
-                case "restart":  ResetGame("map_restart");  return false;
+                case "mr": ResetGame("map_rotate"); return false;
+                case "nm": ResetGame("map " + NEXT_MAP); return false;
+                case "restart": ResetGame("map_restart"); return false;
 
                 case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
-                case "wm": writrMAP(); return false;
                 case "lts":
                     ResetGame("loadscript test\\TEST.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
@@ -224,7 +240,7 @@ namespace Infected
                 case "ults":
                     ResetGame("unloadscript test\\TEST.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
-                     return false;
+                    return false;
                 case "ulis":
                     ResetGame("unloadscript test\\Infected.dll");
                     AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
@@ -245,17 +261,18 @@ namespace Infected
                     case "k": Kick(text); return false;
                     case "magic": Magic(text); return false;
                     case "so": ADMIN.Call("playlocalsound", value); return false;
+                    case "sound": playSound(value); return false;
                     case "map": ResetGame("map " + value); return false;
 
-                    //case "l":
-                    //    script(value, true);
-                    //    executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
-                    //    return false;
+                        //case "l":
+                        //    script(value, true);
+                        //    executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
+                        //    return false;
 
-                    //case "ul":
-                    //    script(value, false);
-                    //    executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
-                    //    return false;
+                        //case "ul":
+                        //    script(value, false);
+                        //    executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
+                        //    return false;
                 }
             }
 

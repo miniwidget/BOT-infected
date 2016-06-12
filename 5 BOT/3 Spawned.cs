@@ -20,7 +20,7 @@ namespace Infected
 
             int num = bot.EntRef;
             if (num == -1) return;
-            
+
             B_SET B = B_FIELD[num];
             B.target = null;
             B.fire = false;
@@ -60,62 +60,74 @@ namespace Infected
         //봇 목표물 찾기 루프
         private void start_bot_search(Entity bot, B_SET B)
         {
-            bool pause = false;
-            int death = B.death;
-            string weapon = B.wep;
-
-            bot.OnInterval(SEARCH_TIME, b =>
+            try
             {
-                if (death != B.death) return false;
-                if (!HUMAN_CONNECTED_) return !(pause = false);
 
-                var target = B.target;
+                bool pause = false;
+                int death = B.death;
+                string weapon = B.wep;
 
-                if (target != null)//이미 타겟을 찾은 경우
+                bot.OnInterval(SEARCH_TIME, b =>
                 {
-                    if (human_List.Contains(target))
+                    if (death != B.death) return false;
+                    if (!HUMAN_CONNECTED_) return !(pause = false);
+
+                    var target = B.target;
+
+                    if (target != null)//이미 타겟을 찾은 경우
                     {
-                        //if (TEST_) return true;
-                        var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < FIRE_DIST) return !(pause = false); 
-                    }
-
-                    B.target = null;
-                    B.fire = false;
-                    bot.Call(33468, weapon, 0);//setweaponammoclip
-                }
-                pause = true;
-
-                //타겟 찾기 시작
-                foreach (Entity human in human_List)
-                {
-                    var POD = human.Origin.DistanceTo(bot.Origin);
-
-                    if (POD < FIRE_DIST)
-                    {
-                        B.target = human;
-                        B.fire = true;
-                        pause = false;
-
-                        b.OnInterval(FIRE_TIME, bb =>
+                        if (human_List.Contains(target))
                         {
-                            if (pause || !B.fire ) return false;
+                            //if (TEST_) return true;
+                            var POD = target.Origin.DistanceTo(bot.Origin);
+                            if (POD < FIRE_DIST)
+                            {
+                                pause = false;
+                                return true;
+                            }
+                        }
 
-                            var ho = human.Origin; ho.Z -= 50;
-
-                            Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
-                            bb.Call(33531, angle);//SetPlayerAngles
-                            bb.Call(33468, weapon, 5);//setweaponammoclip
-                            return true;
-                        });
-
-                        return true;
+                        B.target = null;
+                        B.fire = false;
+                        bot.Call(33468, weapon, 0);//setweaponammoclip
                     }
+                    pause = true;
 
-                }
-                return true;
+                    //타겟 찾기 시작
+                    foreach (Entity human in human_List)
+                    {
+                        var POD = human.Origin.DistanceTo(bot.Origin);
 
-            });
+                        if (POD < FIRE_DIST)
+                        {
+                            B.target = human;
+                            B.fire = true;
+                            pause = false;
+
+                            b.OnInterval(FIRE_TIME, bb =>
+                            {
+                                if (pause || !B.fire) return false;
+
+                                var ho = human.Origin; ho.Z -= 50;
+
+                                Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
+                                bb.Call(33531, angle);//SetPlayerAngles
+                                bb.Call(33468, weapon, 5);//setweaponammoclip
+                                return true;
+                            });
+
+                            return true;
+                        }
+
+                    }
+                    return true;
+
+                });
+            }
+            catch
+            {
+                print("★ 빠른 봇 예외 발생");
+            }
 
         }
 
@@ -129,7 +141,7 @@ namespace Infected
 
             int num = bot.EntRef;
             if (num == -1) return;
-            
+
             if (num == RPG_BOT_ENTREF)
             {
                 bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
@@ -171,68 +183,78 @@ namespace Infected
         }
         private void start_bot_search_slower(Entity bot, B_SET B)
         {
-            bool pause = false;
-            int death = B.death;
-
-            bot.OnInterval(SEARCH_TIME, b =>
+            try
             {
-                if (death != B.death) return false;
-                if (!HUMAN_CONNECTED_) return !(pause = false);
-                
 
-                var target = B.target;
-                if (target != null)//이미 타겟을 찾은 경우
+
+                bool pause = false;
+                int death = B.death;
+
+                bot.OnInterval(SEARCH_TIME, b =>
                 {
-                    if (human_List.Contains(target))
+                    if (death != B.death) return false;
+                    if (!HUMAN_CONNECTED_) return !(pause = false);
+
+                    var target = B.target;
+                    if (target != null)//이미 타겟을 찾은 경우
                     {
-                        //if (TEST_) return true;
-                        var POD = target.Origin.DistanceTo(bot.Origin);
-                        if (POD < FIRE_DIST) return !(pause = false);
-
-                    }
-
-                    B.target = null; //타겟과 거리가 멀어진 경우, 타겟 제거
-                    B.fire = false;
-                    bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
-                }
-
-                pause = true;
-                //B.rooping = true;
-                //타겟 찾기 시작
-                foreach (Entity human in human_List)
-                {
-
-                    var POD = human.Origin.DistanceTo(bot.Origin);
-
-                    if (POD < FIRE_DIST)
-                    {
-                        B.target = human;
-                        B.fire = true;
-                        pause = false;
-                        human.Call(33466, "missile_incoming");
-
-                        b.OnInterval(1500, bb =>
+                        if (human_List.Contains(target))
                         {
+                            //if (TEST_) return true;
+                            var POD = target.Origin.DistanceTo(bot.Origin);
+                            if (POD < FIRE_DIST)
+                            {
+                                pause = false;
+                                return true;
+                            }
+                        }
 
-                            if (pause || !B.fire ) return false;
-
-                            var ho = human.Origin; ho.Z -= 50;
-
-                            Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
-                            bb.Call(33531, angle);//SetPlayerAngles
-                            bb.Call(33468, "rpg_mp", 1);//setweaponammoclip
-                            return true;
-                        });
-
-                        return true;
+                        B.target = null; //타겟과 거리가 멀어진 경우, 타겟 제거
+                        B.fire = false;
+                        bot.Call(33468, "rpg_mp", 0);//setweaponammoclip
                     }
 
-                }
+                    pause = true;
+                    //B.rooping = true;
+                    //타겟 찾기 시작
+                    foreach (Entity human in human_List)
+                    {
 
-                return true;
+                        var POD = human.Origin.DistanceTo(bot.Origin);
 
-            });
+                        if (POD < FIRE_DIST)
+                        {
+                            B.target = human;
+                            B.fire = true;
+                            pause = false;
+                            human.Call(33466, "missile_incoming");
 
+                            b.OnInterval(1500, bb =>
+                            {
+
+                                if (pause || !B.fire) return false;
+
+                                var ho = human.Origin; ho.Z -= 50;
+
+                                Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
+                                bb.Call(33531, angle);//SetPlayerAngles
+                                bb.Call(33468, "rpg_mp", 1);//setweaponammoclip
+                                return true;
+                            });
+
+                            return true;
+                        }
+
+                    }
+
+                    return true;
+
+                });
+            }
+            catch
+            {
+                print("★ 느린 봇 예외 발생");
+            }
         }
 
         #endregion
