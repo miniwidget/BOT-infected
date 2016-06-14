@@ -10,9 +10,9 @@ namespace Infected
 {
     public partial class Infected
     {
-        void ADMIN_BUFF()
+        void setADMIN()
         {
-            ADMIN.Call("notifyonplayercommand", "SPECT", "+strafe");
+            ADMIN.Call("notifyonplayercommand", "SPECT", "centerview");
             bool spect = false;
             ADMIN.OnNotify("SPECT", a =>
             {
@@ -33,7 +33,6 @@ namespace Infected
                 ADMIN.Call("thermalvisionfofoverlayon");
                 ADMIN.Call("setmovespeedscale", 1.5f);
             }
-
         }
         void Human_Connected(Entity player)
         {
@@ -43,28 +42,36 @@ namespace Infected
             if (player.Name == ADMIN_NAME)
             {
                 ADMIN = player;
-                ADMIN_BUFF();
-            }
-
-            var max = 18 - ( BOT_SETTING_NUM +1);
-            if (human_List.Count > max)
-            {
-                Utilities.ExecuteCommand("dropclient " + player.EntRef + "\"SORRY. HUMAN SLOTS ARE OVER. SEE YOU NEXT TIME. [10 BOTS & 7 HUMANS]\"");
-                return;
+                setADMIN();
             }
 
             if (isSurvivor(player))
             {
                 if (!HUMAN_CONNECTED_) HUMAN_CONNECTED_ = true;
-                print(name + " connected ♥" );
+                print(name + " connected ♥");
                 Client_init_GAME_SET(player);
             }
             else
             {
                 //Utilities.ExecuteCommand("dropclient " + player.EntRef + " \"Join Next Round please\"");
-                H_SET H = H_FIELD[player.EntRef];
-                H.LIFE = -1;
+                AXIS_Connected(player);
             }
+
+        }
+        void AXIS_Connected(Entity player)
+        {
+            print("AXIS connected ☜");
+            H_SET H = H_FIELD[player.EntRef];
+            H.LIFE = -2;
+            H.AX_WEP = 1;
+
+            player.SetField("sessionteam", "axis");
+            human_List.Remove(player);
+            player.AfterDelay(100, p =>
+            {
+                player.Call("suicide");
+                player.Notify("menuresponse", "changeclass", "axis_recipe4");
+            });
 
         }
         void Inf_PlayerDisConnected(Entity player)
@@ -72,7 +79,7 @@ namespace Infected
             if (human_List.Contains(player))// 봇 타겟리스트에서 접속 끊은 사람 제거
             {
                 human_List.Remove(player);
-                
+
             }
             if (human_List.Count == 0 && !GAME_ENDED_) HUMAN_CONNECTED_ = false;
         }

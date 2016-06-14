@@ -168,8 +168,6 @@ namespace Infected
         /// <summary>
         /// 봇이 처음 감염된 경우 & 사람이 아무도 접속하지 않은 경우 = 대기상태를 만들기 위해 봇 1 마리를 살려 놓음
         /// </summary>
-
-
         void changeBotClass(Entity bot, int i, bool change)
         {
 
@@ -200,7 +198,7 @@ namespace Infected
 
                 //test += " " + bot.EntRef ;
             }
-            print("■ BOTs: " + max + " AXIS: " + (max - alive) + " ALLIES: " + alive + " Inf : " + First_Infed_Player.Name );
+            print("■ BOTs:" + max + " AXIS:" + (max - alive) + " ALLIES:" + alive + " Inf: " + First_Infed_Player.Name );
             //print("■ HUMANs: " +human_List.Count);
 
             return false;

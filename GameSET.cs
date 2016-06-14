@@ -20,7 +20,7 @@ namespace Infected
             USE_ADMIN_SAFE_, Disable_Melee_,
             DEPLAY_BOT_, SUICIDE_BOT_, OVERFLOW_BOT_,
 
-           PREMATCH_DONE, GAME_ENDED_, HUMAN_CONNECTED_;
+           GAME_ENDED_, HUMAN_CONNECTED_;
 
         float
             INFECTED_TIMELIMIT, PLAYERWAIT_TIME, MATCHSTART_TIME;
@@ -132,7 +132,7 @@ namespace Infected
             }
 
             MAP_NAME = map_list[index];
-            if(MAP_NAME!= currentMAP)
+            if (MAP_NAME != currentMAP)
             {
                 while (index != 0)
                 {
@@ -244,15 +244,15 @@ namespace Infected
             player.Call("notifyonplayercommand", "HOLD_STANCE", "+stance");
             //+strafe
 
-            player.OnNotify("HOLD_STRAFE", ent => 
+            player.OnNotify("HOLD_STRAFE", ent =>
             {
                 if (!isSurvivor(player)) return;
                 var weapon = player.CurrentWeapon;
-                if(weapon.Length>3 && weapon[2] == '5')
+                if (weapon.Length > 3 && weapon[2] == '5')
                 {
                     player.Call("givemaxammo", weapon);
                 }
-                    
+
 
             });
 
@@ -296,6 +296,8 @@ namespace Infected
                 }
                 giveOffhandWeapon(player, offhand);
             });
+
+       
             #endregion
 
             #region AlliesHud
@@ -310,7 +312,7 @@ namespace Infected
             giveWeaponTo(player, getRandomWeapon());
             player.AfterDelay(500, p =>
             {
-                giveOffhandWeapon(player,offhand);
+                giveOffhandWeapon(player, offhand);
             });
             #endregion
 

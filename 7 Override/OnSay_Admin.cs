@@ -212,39 +212,12 @@ level.bcSounds["rpg_incoming"] = "rpg_incoming";
 
             switch (text)
             {
-                case "t1": giveOffhandWeapon(ADMIN, "throwingknife_mp"); break;
-                //case "t2": giveOffhandWeapon(ADMIN, "c4_mp"); break;
-                case "t3": giveOffhandWeapon(ADMIN, "frag_grenade_mp"); break;
-                case "t4": giveOffhandWeapon(ADMIN, "semtex_mp"); break;
-                case "t5": giveOffhandWeapon(ADMIN, "bouncingbetty_mp"); break;
-                case "t6": giveOffhandWeapon(ADMIN, "claymore_mp"); break;
-
                 case "pos": moveBot(null); return false;
-                //case "ab": addBot(); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
 
                 case "1": ADMIN.Call("thermalvisionfofoverlayon"); return false;
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
-
-                case "fr": ResetGame("fast_restart"); return false;
-                case "mr": ResetGame("map_rotate"); return false;
-                case "nm": ResetGame("map " + NEXT_MAP); return false;
-                case "restart": ResetGame("map_restart"); return false;
-
-                case "weapon": ADMIN.Call("iprintln", ADMIN.CurrentWeapon); return false;
-                case "lts":
-                    ResetGame("loadscript test\\TEST.dll");
-                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
-                    return false;
-                case "ults":
-                    ResetGame("unloadscript test\\TEST.dll");
-                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
-                    return false;
-                case "ulis":
-                    ResetGame("unloadscript test\\Infected.dll");
-                    AfterDelay(t2, () => Utilities.ExecuteCommand("fast_restart"));
-                    return false;
             }
 
             var t = text.Split(' ');
@@ -263,16 +236,6 @@ level.bcSounds["rpg_incoming"] = "rpg_incoming";
                     case "so": ADMIN.Call("playlocalsound", value); return false;
                     case "sound": playSound(value); return false;
                     case "map": ResetGame("map " + value); return false;
-
-                        //case "l":
-                        //    script(value, true);
-                        //    executeAfter(t2, "fast_restart", "Loadscript ^2" + value + " ^7executed");
-                        //    return false;
-
-                        //case "ul":
-                        //    script(value, false);
-                        //    executeAfter(t2, "fast_restart", "UnLoadscript ^2" + value + " ^7executed");
-                        //    return false;
                 }
             }
 

@@ -11,10 +11,21 @@ namespace Infected
     public partial class Infected : BaseScript
     {
         //IMPORTANT
-        bool TEST_ = false;
+        bool TEST_;
+        void CheckTEST()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+            if (assembly.Location.Contains("test"))
+            {
+                TEST_ = true;
+                print("■ " + assembly.GetName().Name + ".dll & TEST MODE");
+            }
+        }
 
         public Infected()
         {
+            CheckTEST();
 
             #region Load Custom Setting from a set.txt file
 
@@ -66,13 +77,13 @@ namespace Infected
                             case "BOT_DELAY_TIME": if (int.TryParse(value, out i)) BOT_DELAY_TIME = i; break;
                             case "BOT_SETTING_NUM": if (int.TryParse(value, out i)) BOT_SETTING_NUM = i; break;
                             case "PLAYER_LIFE": if (int.TryParse(value, out i)) PLAYER_LIFE = i; break;
-                            
+
                             case "TEST_": if (!TEST_ && bool.TryParse(value, out b)) TEST_ = b; break;
                             case "DEPLAY_BOT_": if (bool.TryParse(value, out b)) DEPLAY_BOT_ = b; break;
                             case "USE_ADMIN_SAFE_": if (bool.TryParse(value, out b)) USE_ADMIN_SAFE_ = b; break;
                             case "SUICIDE_BOT_": if (bool.TryParse(value, out b)) SUICIDE_BOT_ = b; break;
                             case "Disable_Melee_": if (bool.TryParse(value, out b)) Disable_Melee_ = b; break;
-                            
+
                         }
                     }
 
@@ -84,12 +95,21 @@ namespace Infected
 
             #endregion
 
+            
             PlayerConnecting += player =>
             {
-                if (PREMATCH_DONE) return;//when game map_rotate executed, remove all bot
-                if (player.Name.StartsWith("bot"))
+                string name = player.Name;
+                if (name.StartsWith("bot"))
                 {
-                    Call("kick", player.EntRef);
+                    string state = player.GetField<string>("sessionteam");
+                    if (state == "spectator")
+                    {
+                        Call("kick", player.EntRef);
+                        if (DEPLAY_BOT_)
+                        {
+                            Entity b = Utilities.AddTestClient();
+                        }
+                    }
                 }
             };
 
@@ -97,12 +117,8 @@ namespace Infected
             {
                 if (player.Name.StartsWith("bot"))
                 {
-                    if (!PREMATCH_DONE)//when fast_restart executed, remove all bot
-                    {
-                        Call("kick", player.EntRef);
-                        return;
-                    }
-                    Bot_Connected(player);
+                    if (getBOTCount > BOT_SETTING_NUM) Call("kick", player.EntRef);
+                    else Bot_Connected(player);
                 }
                 else
                 {
@@ -112,28 +128,50 @@ namespace Infected
 
             OnNotify("prematch_done", () =>
             {
-                PREMATCH_DONE = true;
-                if (DEPLAY_BOT_) deplayBOTs();//as soon as a game start, bots are now deploing
+                if (DEPLAY_BOT_) deplayBOTs();
 
                 PlayerDisconnected += Inf_PlayerDisConnected;
 
                 OnNotify("game_ended", (level) =>
                 {
                     GAME_ENDED_ = true;
-                    foreach(var v in B_FIELD)
+                    foreach (var v in B_FIELD)
                     {
                         v.fire = false;
                         v.target = null;
                         v.death += 1;
                     }
-                    foreach(Entity bot in BOTs_List)
+                    foreach (Entity bot in BOTs_List)
                     {
                         bot.Call("setmovespeedscale", 0f);
                     }
                     AfterDelay(20000, () => Utilities.ExecuteCommand("map_rotate"));
                 });
             });
+
+
         }
+        int getBOTCount
+        {
+            get
+            {
+                int botCount = 0;
+                foreach (Entity p in Players)
+                {
+
+                    if (p == null)
+                    {
+                        continue;
+                    }
+                    else if (p.Name.StartsWith("bot"))
+                    {
+                        botCount++;
+                    }
+                }
+                return botCount;
+            }
+        }
+
     }
 }
 
