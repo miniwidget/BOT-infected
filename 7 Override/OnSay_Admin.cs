@@ -160,61 +160,25 @@ namespace Infected
         }
 
         #endregion
-        /*
-level.bcSounds["reload"] = "inform_reloading_generic";
-level.bcSounds["frag_out"] = "inform_attack_grenade";
-level.bcSounds["flash_out"] = "inform_attack_flashbang";
-level.bcSounds["smoke_out"] = "inform_attack_smoke";
-level.bcSounds["conc_out"] = "inform_attack_stun";
-level.bcSounds["c4_plant"] = "inform_attack_thwc4";
-level.bcSounds["claymore_plant"] = "inform_plant_claymore";
-level.bcSounds["semtex_out"] = "semtex_use";
-level.bcSounds["kill"] = "inform_killfirm_infantry";
-level.bcSounds["casualty"] = "inform_casualty_generic";
-level.bcSounds["suppressing_fire"] = "cmd_suppressfire";
-	
-level.bcSounds["semtex_incoming"] = "semtex_incoming";
-level.bcSounds["c4_incoming"] = "c4_incoming";
-level.bcSounds["flash_incoming"] = "flash_incoming";
-level.bcSounds["stun_incoming"] = "stun_incoming";
-level.bcSounds["grenade_incoming"] = "grenade_incoming";
-level.bcSounds["rpg_incoming"] = "rpg_incoming";
 
-        */
-        void playSound(string soundname)
-        {
-            //RU_0_rpg_incoming
-            //US_0_rpg_incoming
-            string voicePrefix = Call<string>("tableLookup", "mp/factionTable.csv", 0, "allies", 7) + "0_";
-            string bcSoounds = "rpg_incoming";
-            string soundAlias = voicePrefix + bcSoounds;//rpg_incoming
-
-            Call("playSoundToTeam", soundAlias, "allies", ADMIN);
-            print(soundAlias);
-            // ADMIN.Call("playsoundtoplayer", soundname);
-            //var here = "enemy_" + Function.Call<string>("tableLookup", "mp/killstreakTable.csv", 0, 1, 10);
-            //print(here);
-            //foreach(Entity bot in BOTs_List)
-            //{
-            //    //print(bot.Name);
-            //    bot.Health = -1;
-            //    bot.Call("setorigin", ADMIN.Origin);
-            //}
-        }
         void ResetGame(string command)
         {
             if (!TEST_) command = command.Replace("test\\", "");
             KickBOTsAll();
             AfterDelay(t1, () => Utilities.ExecuteCommand(command));
         }
+
         bool AdminCommand(string text)
         {
 
             switch (text)
             {
+                case "so":
+                    
+
+                    break;
                 case "pos": moveBot(null); return false;
                 case "kb": Utilities.RawSayAll("^2Kickbots ^7executed"); KickBOTsAll(); return false;
-
                 case "1": ADMIN.Call("thermalvisionfofoverlayon"); return false;
                 case "2": ADMIN.Call("thermalvisionfofoverlayoff"); return false;
                 case "safe": USE_ADMIN_SAFE_ = !USE_ADMIN_SAFE_; sayToAdmin("ADMIN SAFE : " + USE_ADMIN_SAFE_); return false;
@@ -233,8 +197,6 @@ level.bcSounds["rpg_incoming"] = "rpg_incoming";
                     case "die": Die(text); return false;
                     case "k": Kick(text); return false;
                     case "magic": Magic(text); return false;
-                    case "so": ADMIN.Call("playlocalsound", value); return false;
-                    case "sound": playSound(value); return false;
                     case "map": ResetGame("map " + value); return false;
                 }
             }

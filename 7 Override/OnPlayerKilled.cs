@@ -10,11 +10,6 @@ namespace Infected
 {
     public partial class Infected
     {
-        //if(weapon== "remote_tank_projectile_mp"|| weapon == "ugv_turret_mp")
-        //{
-        //    return;
-        //}
-
         void tempFire(B_SET B, Entity bot, Entity target)
         {
 
@@ -44,28 +39,24 @@ namespace Infected
         public override void OnPlayerDamage(Entity player, Entity inflictor, Entity attacker, int damage, int dFlags, string mod, string weapon, Vector3 point, Vector3 dir, string hitLoc)
         {
             //BOTs side
+            if (attacker == player && weapon == "rpg_mp")
+            {
+                player.Health += damage;
+                return;
+            }
             if (player.Name.StartsWith("bot"))
             {
-                if (attacker == player && weapon == "rpg_mp")
-                {
-                    player.Health += damage;
-                    return;
-                }
-
+                
                 var entref = player.EntRef;
                 if (entref == RIOT_BOT_ENTREF) return;
                 if (human_List.Contains(attacker))
                 {
                     if (weapon[2] == '5')
                     {
-                        //if (G_SN.Contains(weapon.Split('_')[1])) player.Health = 0;//iw5_dragunov_mp_dragunovscopevz_xmags
-                        //else
-                        //{
                         B_SET B = B_FIELD[entref];
                         if (B.temp_fire || B.target != null) return;
 
                         tempFire(B, player, attacker);
-                        //}
                     }
                 }
                 return;
@@ -101,6 +92,7 @@ namespace Infected
 
             bool BotAttker = attacker.Name.StartsWith("bot");
 
+          
             if (!BotAttker)//공격자가 사람인 경우, 퍼크 주기
             {
 
@@ -131,7 +123,7 @@ namespace Infected
                     B.target = null;
                     return;
                 }
-
+               
                 if (killed == attacker)
 
                     H_FIELD[killed.EntRef].BY_SUICIDE = true;//자살로 죽음

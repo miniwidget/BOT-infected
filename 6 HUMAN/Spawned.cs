@@ -12,10 +12,12 @@ namespace Infected
     {
         #region isFirstInfected
         bool HUMAN_FIRST_SPAWNED = true;
+        int SA_LENGTH;
         bool isFirstInfected
         {
             get
             {
+                SA_LENGTH = soundAlert.Length;
                 HUMAN_FIRST_SPAWNED = false;
 
                 if (BOTs_List.Count == 0) return false;
@@ -28,6 +30,10 @@ namespace Infected
                 return true;
             }
         }
+        string[] soundAlert =
+        {
+            "AF_1mc_losing_fight", "AF_1mc_lead_lost", "PC_1mc_losing_fight", "PC_1mc_take_positions", "PC_1mc_positions_lock" , "PC_1mc_enemy_take_a" , "PC_1mc_enemy_take_b", "PC_1mc_enemy_take_c"
+        };
         #endregion
 
         #region human_spawned
@@ -45,24 +51,20 @@ namespace Infected
             {
                 if (!H.RESPAWN)
                 {
-                    player.Call("iPrintlnBold", "^2[ ^7" + LIFE + " LIFE ^2] MORE");
+
                     H.LIFE -= 1;
                     H.RESPAWN = true;
-                    player.Call("playlocalsound", "mp_last_stand");
-                    player.SetField("sessionteam", "allies");
+                    player.Call(33466, "mp_last_stand");// playlocalsound
                     player.Notify("menuresponse", "team_marinesopfor", "allies");
-                    player.Call("closePopupMenu");
                     setTeamName();
                 }
                 else
                 {
                     H.PERK = 2;
-                   
-                    player.AfterDelay(100, x =>
-                    {
-                        giveInitalWeaponToHuman(player, H);
-                        H.RESPAWN = false;
-                    });
+                    H.RESPAWN = false;
+                    player.Call("iPrintlnBold", "^2[ ^7" + (LIFE + 1) + " LIFE ^2] MORE");
+                    giveWeaponTo(player, getRandomWeapon());
+                    player.AfterDelay(500, p => giveRandomOffhandWeapon(player, H));
                 }
             }
             else if (LIFE == -1)//change to AXIS
@@ -88,6 +90,8 @@ namespace Infected
                     H.PERK = 50;
                     AxisHud(player);
                     AxisWeapon_by_init(player);
+
+                    AfterDelay(t1, () => player.Call("playsoundtoteam", soundAlert[rnd.Next(SA_LENGTH)], "allies"));
                 }
                 else
                 {

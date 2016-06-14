@@ -77,7 +77,10 @@ namespace Infected
             public bool BY_SUICIDE { get; set; }
             public int LIFE { get; set; }
             public bool RESPAWN { get; set; }
+            public bool CLASS_CHANGED { get; set; }
             public HudElem WEAPONINFO { get; set; }
+            public bool USE_TANK { get; set; }
+
         }
         List<H_SET> H_FIELD = new List<H_SET>(18);
         //Dictionary<int, int> H_ID = new Dictionary<int, int>();
@@ -98,7 +101,7 @@ namespace Infected
             Call("setdvar", "scr_game_allowkillcam", "0");
             Call("setdvar", "scr_infect_timelimit", INFECTED_TIMELIMIT);
 
-            if (SERVER_NAME == "^2BOT ^7SERVER" || SERVER_NAME == "^2BOT ^7test server") SERVER_NAME += rnd.Next(1000);
+            if (SERVER_NAME == "^2BOT ^7SERVER" || SERVER_NAME == "^2BOT ^7test server") SERVER_NAME += " " + rnd.Next(1000);
             Utilities.ExecuteCommand("sv_hostname " + SERVER_NAME);
             for (int i = 0; i < 18; i++)
             {
@@ -200,6 +203,11 @@ namespace Infected
         /// </summary>
         void Client_init_GAME_SET(Entity player)
         {
+            #region change class
+            player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
+            #endregion
+
+            #region set
             human_List.Add(player);
 
             H_SET H = H_FIELD[player.EntRef];
@@ -207,6 +215,7 @@ namespace Infected
             H.PERK = 2;
             H.AX_WEP = 0;
             H.BY_SUICIDE = false;
+            #endregion
 
             #region SetClientDvar
 
@@ -297,15 +306,52 @@ namespace Infected
                 giveOffhandWeapon(player, offhand);
             });
 
-       
+            #region TANK
+
+            Entity TANK = null;
+            player.OnNotify("weapon_change", (Entity ent, Parameter newWeap) =>
+            {
+                if (H.USE_TANK) return;
+                string weap = newWeap.ToString();
+                //print(weap);
+                if (weap == "killstreak_remote_tank_remote_mp")
+                {
+                    H.USE_TANK = true;
+                    TANK = null;
+
+                    bool found = false;
+                    for (int i = 0; i < 2048; i++)
+                    {
+                        TANK = Entity.GetEntity(i);
+                        if (TANK == null) continue;
+                        var model = TANK.GetField<string>("model");
+                        if (model == "vehicle_ugv_talon_mp")
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) return;
+
+                    //print("들어왔다 "+TANK.Name);
+                    human_List.Add(TANK);
+                }
+            });
+            player.OnNotify("end_remote", (Entity ent) =>
+            {
+                if (H.USE_TANK)
+                {
+                    H.USE_TANK = false;
+                    human_List.Remove(TANK);
+                }
+            });
+            
+            #endregion
+
             #endregion
 
             #region AlliesHud
             AlliesHud(player, offhand.Replace("_mp", "").ToUpper());
-            #endregion
-
-            #region change class
-            player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
             #endregion
 
             #region giveweapon

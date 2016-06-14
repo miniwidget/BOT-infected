@@ -17,9 +17,13 @@ namespace Infected
         private void spawned_bot(Entity bot)
         {
             if (GAME_ENDED_) return;
-
             int num = bot.EntRef;
             if (num == -1) return;
+
+            if (num != JUGG_BOT_ENTREF)
+            {
+                bot.Health = -1;
+            }
 
             B_SET B = B_FIELD[num];
             B.target = null;
@@ -27,11 +31,8 @@ namespace Infected
             B.temp_fire = false;
             B.death += 1;
             if (B.wep == null) B.wep = bot.CurrentWeapon;
-            bot.Call("hide");
-            bot.Call("setmovespeedscale", 0f);
-
-
-            if (num != 0) bot.Health = -1;//Not Jugg bot
+            bot.Call(32848);//hide
+            bot.Call(33220, 0f);//setmovescale
 
             var weapon = B.wep;
             bot.Call(33468, weapon, 0);//setweaponammoclip
@@ -41,19 +42,18 @@ namespace Infected
             {
                 if (GAME_ENDED_) return;
                 B.fire = true;
-                b.Call("show");
-
-                if (num != 0)//GENERAL
+                b.Call(32847);//show
+                bot.Call(33220, 1f);
+                if (num != JUGG_BOT_ENTREF)
                 {
                     b.Health = 150;
-                    bot.Call("setmovespeedscale", 1f);
+                    start_bot_search(b, B);
                 }
-                else//JUGG
+                else
                 {
-                    bot.Call("setmovespeedscale", 0.6f);
+                    start_bot_search_Jugg(b, B);
                 }
 
-                start_bot_search(b, B);
             });
         }
 
@@ -103,7 +103,6 @@ namespace Infected
                             B.target = human;
                             B.fire = true;
                             pause = false;
-
                             b.OnInterval(FIRE_TIME, bb =>
                             {
                                 if (pause || !B.fire) return false;
@@ -119,6 +118,84 @@ namespace Infected
                             return true;
                         }
 
+                    }
+                    return true;
+
+                });
+            }
+            catch
+            {
+                print("★ 빠른 봇 예외 발생");
+            }
+
+        }
+        private void start_bot_search_Jugg(Entity bot, B_SET B)
+        {
+            try
+            {
+
+                bool pause = false;
+                int death = B.death;
+                string weapon = B.wep;
+
+                bot.OnInterval(SEARCH_TIME, b =>
+                {
+                    if (death != B.death) return false;
+                    if (!HUMAN_CONNECTED_) return !(pause = false);
+
+                    var target = B.target;
+
+                    if (target != null)//이미 타겟을 찾은 경우
+                    {
+                        if (human_List.Contains(target))
+                        {
+                            //if (TEST_) return true;
+                            var POD = target.Origin.DistanceTo(bot.Origin);
+                            if (POD < FIRE_DIST)
+                            {
+                                pause = false;
+                                return true;
+                            }
+                        }
+
+                        B.target = null;
+                        B.fire = false;
+                        bot.Call(33468, weapon, 0);//setweaponammoclip
+                    }
+                    pause = true;
+
+                    //타겟 찾기 시작
+                    bool found = false;
+                    foreach (Entity human in human_List)
+                    {
+                        var POD = human.Origin.DistanceTo(bot.Origin);
+
+                        if (POD < FIRE_DIST)
+                        {
+                            if (!found)
+                            {
+                                found = true;
+                                target = B.target = human;
+                                B.fire = true;
+                                pause = false;
+                            }
+                            if(human.Name !=null) human.Call(33466, "AF_victory_music");//"playlocalsound"
+                        }
+                    }
+
+                    if (target != null)
+                    {
+                        b.OnInterval(FIRE_TIME, bb =>
+                        {
+                            if (pause || !B.fire) return false;
+
+                            var ho = target.Origin; ho.Z -= 50;
+
+                            Vector3 angle = Call<Vector3>(247, ho - bb.Origin);//vectortoangles
+                            bb.Call(33531, angle);//SetPlayerAngles
+                            bb.Call(33468, weapon, 5);//setweaponammoclip
+                            return true;
+                        });
                     }
                     return true;
 
@@ -155,8 +232,8 @@ namespace Infected
             B.death += 1;
             if (B.wep == null) B.wep = bot.CurrentWeapon;
 
-            bot.Call("hide");
-            bot.Call("setmovespeedscale", 0f);
+            bot.Call(32848);//hide
+            bot.Call(33220, 0f);
             bot.Health = -1;
 
 
@@ -167,17 +244,17 @@ namespace Infected
                 B.fire = true;
 
                 bot.Health = 150;
-                b.Call("show");
+                b.Call(32847);//show
 
 
                 if (num == RPG_BOT_ENTREF)//rpg bot
                 {
-                    bot.Call("setmovespeedscale", 0.7f);
+                    bot.Call(33220, 0.7f);
                     start_bot_search_slower(b, B);
                 }
                 else//riot bot
                 {
-                    bot.Call("setmovespeedscale", 2f);
+                    bot.Call(33220, 2f);//setmovespeedscale
                 }
             });
         }
@@ -227,7 +304,8 @@ namespace Infected
                             B.target = human;
                             B.fire = true;
                             pause = false;
-                            human.Call(33466, "missile_incoming");
+
+                            if(human.Name!=null) human.Call(33466, "missile_incoming");
 
                             b.OnInterval(1500, bb =>
                             {

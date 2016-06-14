@@ -13,7 +13,7 @@ namespace Infected
     {
 
         #region Bot_Connected
-        int RPG_BOT_ENTREF,RIOT_BOT_ENTREF;
+        int RPG_BOT_ENTREF,RIOT_BOT_ENTREF, JUGG_BOT_ENTREF;
 
         int BOT_CLASS_NUM;
         private void Bot_Connected(Entity bot)
@@ -34,7 +34,8 @@ namespace Infected
                 return;
             }
 
-            if (i == 1) RPG_BOT_ENTREF = bot.EntRef;
+            if (i == 0) JUGG_BOT_ENTREF = bot.EntRef;
+            else if (i == 1) RPG_BOT_ENTREF = bot.EntRef;
             else if(i==2)RIOT_BOT_ENTREF = bot.EntRef;
                 
             //print(i + "//" + (BOT_SETTING_NUM - 1));

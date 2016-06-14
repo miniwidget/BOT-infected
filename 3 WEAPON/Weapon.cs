@@ -10,15 +10,6 @@ namespace Infected
     public partial class Infected
     {
         #region primary
-        void giveInitalWeaponToHuman(Entity player, H_SET H)
-        {
-            giveWeaponTo(player, getRandomWeapon());
-            player.Notify("menuresponse", "changeclass", "allies_recipe" + rnd.Next(1, 6));
-            player.AfterDelay(500, p =>
-            {
-                giveRandomOffhandWeapon(player, H);
-            });
-        }
         string getRandomWeapon()
         {
             int i = rnd.Next(7);
@@ -147,7 +138,7 @@ namespace Infected
                 var type = getWeaponType(CW);
                 if (type == null || type == "sn")
                 {
-                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON, but ^2AMMO REFILLD");
+                    showMessage(player, "[ ^2NOT APPLIED ^7] FOR THIS WEAPON");
                     return;
                 }
 
@@ -228,7 +219,7 @@ namespace Infected
                 }
                 else
                 {
-                    showMessage(player, "^2NOT APPLIED ^7FOR THIS WEAPON, but ^2AMMO REFILLD");
+                    showMessage(player, "[ ^2NOT APPLIED ^7] FOR THIS WEAPON");
                 }
 
             }
