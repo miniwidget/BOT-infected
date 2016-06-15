@@ -15,7 +15,7 @@ namespace Infected
         #region Bot_Connected
         int RPG_BOT_ENTREF,RIOT_BOT_ENTREF, JUGG_BOT_ENTREF;
 
-        int BOT_CLASS_NUM;
+        int BOT_CLASS_NUM=3;
         private void Bot_Connected(Entity bot)
         {
 
@@ -43,7 +43,7 @@ namespace Infected
 
             if (i > 9)
             {
-                if (BOT_CLASS_NUM > 9) BOT_CLASS_NUM = 0;
+                if (BOT_CLASS_NUM > 9) BOT_CLASS_NUM = 3;
                 i = BOT_CLASS_NUM;
                 BOT_CLASS_NUM++;
             }

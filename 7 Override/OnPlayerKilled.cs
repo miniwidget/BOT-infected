@@ -49,16 +49,16 @@ namespace Infected
                 
                 var entref = player.EntRef;
                 if (entref == RIOT_BOT_ENTREF) return;
-                if (human_List.Contains(attacker))
+                //if (human_List.Contains(attacker))
+                //{
+                if (weapon[2] == '5')
                 {
-                    if (weapon[2] == '5')
-                    {
-                        B_SET B = B_FIELD[entref];
-                        if (B.temp_fire || B.target != null) return;
+                    B_SET B = B_FIELD[entref];
+                    if (B.temp_fire || B.target != null) return;
 
-                        tempFire(B, player, attacker);
-                    }
+                    tempFire(B, player, attacker);
                 }
+                //}
                 return;
             }
 
